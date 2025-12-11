@@ -1,6 +1,6 @@
 @if (session('success'))
-    <div x-data="{ show: true }" 
-         x-show="show" 
+    <div x-data="{ show: true }"
+         x-show="show"
          x-transition
          x-init="setTimeout(() => show = false, 5000)"
          class="mb-4 p-4 rounded-lg bg-green-50 border border-green-200">
@@ -25,8 +25,8 @@
 @endif
 
 @if (session('error'))
-    <div x-data="{ show: true }" 
-         x-show="show" 
+    <div x-data="{ show: true }"
+         x-show="show"
          x-transition
          x-init="setTimeout(() => show = false, 5000)"
          class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200">
@@ -51,8 +51,8 @@
 @endif
 
 @if ($errors->any())
-    <div x-data="{ show: true }" 
-         x-show="show" 
+    <div x-data="{ show: true }"
+         x-show="show"
          x-transition
          class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200">
         <div class="flex">

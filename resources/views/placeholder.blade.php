@@ -13,7 +13,7 @@
             </div>
             <h1 class="text-4xl font-bold text-gray-900 mb-4">Coming Soon</h1>
             <p class="text-lg text-gray-600 mb-8">
-                This feature is currently under development and will be available soon. 
+                This feature is currently under development and will be available soon.
                 We're working hard to bring you an amazing experience!
             </p>
             <a href="{{ route('dashboard') }}" class="btn-primary inline-flex items-center px-6 py-3 rounded-md text-base font-medium text-white">
