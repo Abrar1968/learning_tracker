@@ -1,0 +1,83 @@
+# Auto-labeling configuration for pull requests
+# Labels are applied based on file paths changed in the PR
+
+# Backend
+backend:
+  - app/**/*
+  - config/**/*
+  - database/**/*
+  - routes/**/*
+
+# Frontend
+frontend:
+  - resources/views/**/*
+  - resources/js/**/*
+  - resources/css/**/*
+
+# Models
+models:
+  - app/Models/**/*
+
+# Services
+services:
+  - app/Services/**/*
+
+# Controllers
+controllers:
+  - app/Http/Controllers/**/*
+
+# Middleware
+middleware:
+  - app/Http/Middleware/**/*
+
+# Migrations
+migrations:
+  - database/migrations/**/*
+
+# Seeders
+seeders:
+  - database/seeders/**/*
+
+# Tests
+tests:
+  - tests/**/*
+
+# Documentation
+documentation:
+  - docs/**/*
+  - README.md
+  - CONTRIBUTING.md
+  - CHANGELOG.md
+
+# Configuration
+configuration:
+  - .env.example
+  - config/**/*
+  - composer.json
+  - package.json
+
+# CI/CD
+ci-cd:
+  - .github/workflows/**/*
+  - .github/actions/**/*
+
+# Dependencies
+dependencies:
+  - composer.json
+  - composer.lock
+  - package.json
+  - package-lock.json
+
+# Assets
+assets:
+  - public/**/*
+  - resources/css/**/*
+  - vite.config.js
+  - tailwind.config.js
+
+# Security
+security:
+  - app/Http/Middleware/Authenticate.php
+  - app/Policies/**/*
+  - config/auth.php
+  - config/cors.php
