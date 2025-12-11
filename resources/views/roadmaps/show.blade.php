@@ -5,11 +5,11 @@
                 {{ $roadmap->title }}
             </h2>
             <div class="flex space-x-2">
-                <a href="{{ route('topics.create', ['roadmap_id' => $roadmap->id]) }}" 
+                <a href="{{ route('topics.create', ['roadmap_id' => $roadmap->id]) }}"
                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm">
                     Add Topic
                 </a>
-                <a href="{{ route('roadmaps.edit', $roadmap) }}" 
+                <a href="{{ route('roadmaps.edit', $roadmap) }}"
                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded text-sm">
                     Edit
                 </a>
@@ -65,7 +65,7 @@
             <!-- Topics List -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <h3 class="text-lg font-semibold mb-4">Topics</h3>
-                
+
                 @if($roadmap->topics->isEmpty())
                     <p class="text-gray-500 text-center py-8">No topics yet. Add your first topic to get started!</p>
                 @else
@@ -88,7 +88,7 @@
                                                 {{ ucfirst(str_replace('_', ' ', $topic->status)) }}
                                             </span>
                                         </div>
-                                        
+
                                         @if($topic->description)
                                             <p class="text-sm text-gray-600 mb-2">{{ Str::limit($topic->description, 150) }}</p>
                                         @endif
@@ -111,7 +111,7 @@
                                                     <span>{{ $topic->progress->getProgressPercentage() }}%</span>
                                                 </div>
                                                 <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                                    <div class="bg-indigo-600 h-1.5 rounded-full" 
+                                                    <div class="bg-indigo-600 h-1.5 rounded-full"
                                                          style="width: {{ $topic->progress->getProgressPercentage() }}%"></div>
                                                 </div>
                                             </div>
@@ -119,11 +119,11 @@
                                     </div>
 
                                     <div class="ml-4 flex-shrink-0 flex space-x-2">
-                                        <a href="{{ route('topics.show', $topic) }}" 
+                                        <a href="{{ route('topics.show', $topic) }}"
                                            class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
                                             View
                                         </a>
-                                        <a href="{{ route('topics.edit', $topic) }}" 
+                                        <a href="{{ route('topics.edit', $topic) }}"
                                            class="text-gray-600 hover:text-gray-900 text-sm font-medium">
                                             Edit
                                         </a>
@@ -137,7 +137,7 @@
                                             <div class="border-l-2 border-gray-300 pl-4 py-2">
                                                 <div class="flex items-center justify-between">
                                                     <div>
-                                                        <a href="{{ route('topics.show', $subtopic) }}" 
+                                                        <a href="{{ route('topics.show', $subtopic) }}"
                                                            class="text-gray-900 hover:text-indigo-600 font-medium">
                                                             {{ $subtopic->title }}
                                                         </a>
@@ -149,7 +149,7 @@
                                                             {{ ucfirst(str_replace('_', ' ', $subtopic->status)) }}
                                                         </span>
                                                     </div>
-                                                    <a href="{{ route('topics.show', $subtopic) }}" 
+                                                    <a href="{{ route('topics.show', $subtopic) }}"
                                                        class="text-indigo-600 hover:text-indigo-900 text-sm">
                                                         View →
                                                     </a>
@@ -168,7 +168,7 @@
             @if($roadmap->status === 'completed')
                 <div class="mt-6">
                     @if($roadmap->certificate)
-                        <a href="{{ route('certificates.show', $roadmap->certificate) }}" 
+                        <a href="{{ route('certificates.show', $roadmap->certificate) }}"
                            class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -178,7 +178,7 @@
                     @else
                         <form action="{{ route('certificates.generate', $roadmap) }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" 
+                            <button type="submit"
                                     class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />

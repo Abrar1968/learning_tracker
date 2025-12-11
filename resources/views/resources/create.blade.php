@@ -8,8 +8,8 @@
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <form action="{{ route('resources.store') }}" 
-                      method="POST" 
+                <form action="{{ route('resources.store') }}"
+                      method="POST"
                       enctype="multipart/form-data"
                       class="p-6"
                       x-data="{ resourceType: '{{ old('type', 'article') }}' }">
@@ -21,9 +21,9 @@
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
                             Title <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="title" 
-                               id="title" 
+                        <input type="text"
+                               name="title"
+                               id="title"
                                value="{{ old('title') }}"
                                required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -37,8 +37,8 @@
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                             Description
                         </label>
-                        <textarea name="description" 
-                                  id="description" 
+                        <textarea name="description"
+                                  id="description"
                                   rows="3"
                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
                         @error('description')
@@ -51,7 +51,7 @@
                         <label for="type" class="block text-sm font-medium text-gray-700 mb-2">
                             Resource Type <span class="text-red-500">*</span>
                         </label>
-                        <select name="type" 
+                        <select name="type"
                                 id="type"
                                 x-model="resourceType"
                                 required
@@ -73,9 +73,9 @@
                         <label for="url" class="block text-sm font-medium text-gray-700 mb-2">
                             URL
                         </label>
-                        <input type="url" 
-                               name="url" 
-                               id="url" 
+                        <input type="url"
+                               name="url"
+                               id="url"
                                value="{{ old('url') }}"
                                placeholder="https://..."
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -89,8 +89,8 @@
                         <label for="file" class="block text-sm font-medium text-gray-700 mb-2">
                             File (Optional)
                         </label>
-                        <input type="file" 
-                               name="file" 
+                        <input type="file"
+                               name="file"
                                id="file"
                                class="mt-1 block w-full text-sm text-gray-500
                                       file:mr-4 file:py-2 file:px-4
@@ -110,9 +110,9 @@
                             <label for="estimated_duration" class="block text-sm font-medium text-gray-700 mb-2">
                                 Estimated Duration (minutes)
                             </label>
-                            <input type="number" 
-                                   name="estimated_duration" 
-                                   id="estimated_duration" 
+                            <input type="number"
+                                   name="estimated_duration"
+                                   id="estimated_duration"
                                    value="{{ old('estimated_duration') }}"
                                    min="0"
                                    placeholder="60"
@@ -126,9 +126,9 @@
                             <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">
                                 Tags (comma separated)
                             </label>
-                            <input type="text" 
-                                   name="tags" 
-                                   id="tags" 
+                            <input type="text"
+                                   name="tags"
+                                   id="tags"
                                    value="{{ old('tags') }}"
                                    placeholder="laravel, php, backend"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -141,11 +141,11 @@
 
                     <!-- Submit Buttons -->
                     <div class="flex items-center justify-end space-x-3">
-                        <a href="{{ route('topics.show', $topic) }}" 
+                        <a href="{{ route('topics.show', $topic) }}"
                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
                             Cancel
                         </a>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Add Resource
                         </button>

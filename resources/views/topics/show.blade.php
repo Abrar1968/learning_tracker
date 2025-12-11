@@ -12,11 +12,11 @@
                 </p>
             </div>
             <div class="flex space-x-2">
-                <a href="{{ route('resources.create', ['topic_id' => $topic->id]) }}" 
+                <a href="{{ route('resources.create', ['topic_id' => $topic->id]) }}"
                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm">
                     Add Resource
                 </a>
-                <a href="{{ route('topics.edit', $topic) }}" 
+                <a href="{{ route('topics.edit', $topic) }}"
                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded text-sm">
                     Edit
                 </a>
@@ -78,7 +78,7 @@
                     <!-- Resources -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold mb-4">Resources ({{ $topic->resources->count() }})</h3>
-                        
+
                         @if($topic->resources->isEmpty())
                             <p class="text-gray-500 text-center py-4">No resources yet.</p>
                         @else
@@ -120,9 +120,9 @@
                                                                 <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
                                                             </svg>
                                                     @endswitch
-                                                    
+
                                                     <h4 class="font-semibold text-gray-900">{{ $resource->title }}</h4>
-                                                    
+
                                                     @if($resource->is_completed)
                                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                                             ✓ Completed
@@ -173,13 +173,13 @@
                                                     <form action="{{ route('resources.complete', $resource) }}" method="POST">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" 
+                                                        <button type="submit"
                                                                 class="text-green-600 hover:text-green-900 text-sm font-medium">
                                                             Mark Done
                                                         </button>
                                                     </form>
                                                 @endif
-                                                <a href="{{ route('resources.edit', $resource) }}" 
+                                                <a href="{{ route('resources.edit', $resource) }}"
                                                    class="text-gray-600 hover:text-gray-900 text-sm">
                                                     Edit
                                                 </a>
@@ -200,7 +200,7 @@
                                     <div class="border border-gray-200 rounded-lg p-4">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <a href="{{ route('topics.show', $subtopic) }}" 
+                                                <a href="{{ route('topics.show', $subtopic) }}"
                                                    class="text-gray-900 hover:text-indigo-600 font-medium">
                                                     {{ $subtopic->title }}
                                                 </a>
@@ -212,7 +212,7 @@
                                                     {{ ucfirst(str_replace('_', ' ', $subtopic->status)) }}
                                                 </span>
                                             </div>
-                                            <a href="{{ route('topics.show', $subtopic) }}" 
+                                            <a href="{{ route('topics.show', $subtopic) }}"
                                                class="text-indigo-600 hover:text-indigo-900 text-sm">
                                                 View →
                                             </a>
@@ -229,7 +229,7 @@
                     <!-- Progress Card -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold mb-4">Progress</h3>
-                        
+
                         @if($topic->progress)
                             <div class="mb-4">
                                 <div class="flex justify-between text-sm text-gray-600 mb-2">
@@ -237,7 +237,7 @@
                                     <span class="font-semibold">{{ $topic->progress->getProgressPercentage() }}%</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-3">
-                                    <div class="bg-indigo-600 h-3 rounded-full transition-all" 
+                                    <div class="bg-indigo-600 h-3 rounded-full transition-all"
                                          style="width: {{ $topic->progress->getProgressPercentage() }}%"></div>
                                 </div>
                             </div>
@@ -275,20 +275,20 @@
                             <div class="space-y-2">
                                 @if(!$topic->progress->isCompleted())
                                     <!-- Log Time Form -->
-                                    <form action="{{ route('progress.log-time', $topic->progress) }}" method="POST" 
+                                    <form action="{{ route('progress.log-time', $topic->progress) }}" method="POST"
                                           x-data="{ minutes: '' }"
                                           @submit.prevent="if(minutes) $el.submit()">
                                         @csrf
                                         @method('PATCH')
                                         <div class="flex space-x-2">
-                                            <input type="number" 
-                                                   name="minutes" 
+                                            <input type="number"
+                                                   name="minutes"
                                                    x-model="minutes"
                                                    placeholder="Minutes"
                                                    min="1"
                                                    required
                                                    class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
                                                 Log Time
                                             </button>
@@ -299,7 +299,7 @@
                                     <form action="{{ route('progress.update', $topic->progress) }}" method="POST">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" 
+                                        <button type="submit"
                                                 class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm">
                                             Update Progress
                                         </button>
@@ -310,7 +310,7 @@
                                           onsubmit="return confirm('Mark this topic as completed?');">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" 
+                                        <button type="submit"
                                                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm">
                                             Complete Topic
                                         </button>
@@ -327,7 +327,7 @@
                         @else
                             <form action="{{ route('progress.start', $topic) }}" method="POST">
                                 @csrf
-                                <button type="submit" 
+                                <button type="submit"
                                         class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded">
                                     Start Learning
                                 </button>

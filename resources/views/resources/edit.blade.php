@@ -8,8 +8,8 @@
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <form action="{{ route('resources.update', $resource) }}" 
-                      method="POST" 
+                <form action="{{ route('resources.update', $resource) }}"
+                      method="POST"
                       enctype="multipart/form-data"
                       class="p-6"
                       x-data="{ resourceType: '{{ old('type', $resource->type) }}' }">
@@ -21,9 +21,9 @@
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
                             Title <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="title" 
-                               id="title" 
+                        <input type="text"
+                               name="title"
+                               id="title"
                                value="{{ old('title', $resource->title) }}"
                                required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -37,8 +37,8 @@
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                             Description
                         </label>
-                        <textarea name="description" 
-                                  id="description" 
+                        <textarea name="description"
+                                  id="description"
                                   rows="3"
                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description', $resource->description) }}</textarea>
                         @error('description')
@@ -51,7 +51,7 @@
                         <label for="type" class="block text-sm font-medium text-gray-700 mb-2">
                             Resource Type <span class="text-red-500">*</span>
                         </label>
-                        <select name="type" 
+                        <select name="type"
                                 id="type"
                                 x-model="resourceType"
                                 required
@@ -73,9 +73,9 @@
                         <label for="url" class="block text-sm font-medium text-gray-700 mb-2">
                             URL
                         </label>
-                        <input type="url" 
-                               name="url" 
-                               id="url" 
+                        <input type="url"
+                               name="url"
+                               id="url"
                                value="{{ old('url', $resource->url) }}"
                                placeholder="https://..."
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -88,10 +88,10 @@
                     @if($resource->file_path)
                         <div class="mb-4 p-4 bg-gray-50 rounded-lg">
                             <p class="text-sm text-gray-600">
-                                Current file: <span class="font-medium">{{ basename($resource->file_path) }}</span> 
+                                Current file: <span class="font-medium">{{ basename($resource->file_path) }}</span>
                                 ({{ $resource->getFileSizeFormatted() }})
                             </p>
-                            <a href="{{ Storage::url($resource->file_path) }}" target="_blank" 
+                            <a href="{{ Storage::url($resource->file_path) }}" target="_blank"
                                class="text-sm text-indigo-600 hover:text-indigo-800">
                                 Download current file →
                             </a>
@@ -103,8 +103,8 @@
                         <label for="file" class="block text-sm font-medium text-gray-700 mb-2">
                             {{ $resource->file_path ? 'Replace File (Optional)' : 'File (Optional)' }}
                         </label>
-                        <input type="file" 
-                               name="file" 
+                        <input type="file"
+                               name="file"
                                id="file"
                                class="mt-1 block w-full text-sm text-gray-500
                                       file:mr-4 file:py-2 file:px-4
@@ -126,9 +126,9 @@
                             <label for="estimated_duration" class="block text-sm font-medium text-gray-700 mb-2">
                                 Estimated Duration (minutes)
                             </label>
-                            <input type="number" 
-                                   name="estimated_duration" 
-                                   id="estimated_duration" 
+                            <input type="number"
+                                   name="estimated_duration"
+                                   id="estimated_duration"
                                    value="{{ old('estimated_duration', $resource->estimated_duration) }}"
                                    min="0"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -141,9 +141,9 @@
                             <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">
                                 Tags (comma separated)
                             </label>
-                            <input type="text" 
-                                   name="tags" 
-                                   id="tags" 
+                            <input type="text"
+                                   name="tags"
+                                   id="tags"
                                    value="{{ old('tags', $resource->tags->pluck('tag_name')->implode(', ')) }}"
                                    placeholder="laravel, php, backend"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -157,8 +157,8 @@
                     <!-- Is Completed Checkbox -->
                     <div class="mb-6">
                         <label class="flex items-center">
-                            <input type="checkbox" 
-                                   name="is_completed" 
+                            <input type="checkbox"
+                                   name="is_completed"
                                    value="1"
                                    {{ old('is_completed', $resource->is_completed) ? 'checked' : '' }}
                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -168,11 +168,11 @@
 
                     <!-- Submit Buttons -->
                     <div class="flex items-center justify-end space-x-3">
-                        <a href="{{ route('topics.show', $resource->topic) }}" 
+                        <a href="{{ route('topics.show', $resource->topic) }}"
                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
                             Cancel
                         </a>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Update Resource
                         </button>
@@ -181,11 +181,11 @@
 
                 <!-- Delete Button -->
                 <div class="border-t border-gray-200 p-6">
-                    <form action="{{ route('resources.destroy', $resource) }}" method="POST" 
+                    <form action="{{ route('resources.destroy', $resource) }}" method="POST"
                           onsubmit="return confirm('Are you sure you want to delete this resource?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" 
+                        <button type="submit"
                                 class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                             Delete Resource
                         </button>

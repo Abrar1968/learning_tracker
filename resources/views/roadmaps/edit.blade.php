@@ -17,9 +17,9 @@
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
                             Title <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="title" 
-                               id="title" 
+                        <input type="text"
+                               name="title"
+                               id="title"
                                value="{{ old('title', $roadmap->title) }}"
                                required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -33,8 +33,8 @@
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                             Description
                         </label>
-                        <textarea name="description" 
-                                  id="description" 
+                        <textarea name="description"
+                                  id="description"
                                   rows="4"
                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description', $roadmap->description) }}</textarea>
                         @error('description')
@@ -47,7 +47,7 @@
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
                             Status
                         </label>
-                        <select name="status" 
+                        <select name="status"
                                 id="status"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             <option value="not_started" {{ old('status', $roadmap->status) === 'not_started' ? 'selected' : '' }}>Not Started</option>
@@ -65,9 +65,9 @@
                             <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
                                 Start Date
                             </label>
-                            <input type="date" 
-                                   name="start_date" 
-                                   id="start_date" 
+                            <input type="date"
+                                   name="start_date"
+                                   id="start_date"
                                    value="{{ old('start_date', $roadmap->start_date?->format('Y-m-d')) }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @error('start_date')
@@ -79,9 +79,9 @@
                             <label for="target_end_date" class="block text-sm font-medium text-gray-700 mb-2">
                                 Target End Date
                             </label>
-                            <input type="date" 
-                                   name="target_end_date" 
-                                   id="target_end_date" 
+                            <input type="date"
+                                   name="target_end_date"
+                                   id="target_end_date"
                                    value="{{ old('target_end_date', $roadmap->target_end_date?->format('Y-m-d')) }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @error('target_end_date')
@@ -92,11 +92,11 @@
 
                     <!-- Submit Buttons -->
                     <div class="flex items-center justify-end space-x-3">
-                        <a href="{{ route('roadmaps.show', $roadmap) }}" 
+                        <a href="{{ route('roadmaps.show', $roadmap) }}"
                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
                             Cancel
                         </a>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Update Roadmap
                         </button>
@@ -105,11 +105,11 @@
 
                 <!-- Delete Button -->
                 <div class="border-t border-gray-200 p-6">
-                    <form action="{{ route('roadmaps.destroy', $roadmap) }}" method="POST" 
+                    <form action="{{ route('roadmaps.destroy', $roadmap) }}" method="POST"
                           onsubmit="return confirm('Are you sure you want to delete this roadmap? This action cannot be undone.');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" 
+                        <button type="submit"
                                 class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                             Delete Roadmap
                         </button>

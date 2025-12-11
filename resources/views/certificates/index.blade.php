@@ -15,7 +15,7 @@
                     <h3 class="mt-2 text-sm font-medium text-gray-900">No certificates</h3>
                     <p class="mt-1 text-sm text-gray-500">Complete roadmaps to earn certificates.</p>
                     <div class="mt-6">
-                        <a href="{{ route('roadmaps.index') }}" 
+                        <a href="{{ route('roadmaps.index') }}"
                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
                             View Roadmaps
                         </a>
@@ -65,11 +65,11 @@
 
                                 <!-- Actions -->
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('certificates.show', $certificate) }}" 
+                                    <a href="{{ route('certificates.show', $certificate) }}"
                                        class="flex-1 text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm">
                                         View
                                     </a>
-                                    <button onclick="window.open('{{ route('certificates.show', $certificate) }}').print()" 
+                                    <button onclick="window.open('{{ route('certificates.show', $certificate) }}').print()"
                                             class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm">
                                         Print
                                     </button>

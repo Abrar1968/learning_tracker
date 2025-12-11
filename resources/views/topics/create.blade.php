@@ -17,9 +17,9 @@
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
                             Title <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="title" 
-                               id="title" 
+                        <input type="text"
+                               name="title"
+                               id="title"
                                value="{{ old('title') }}"
                                required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -33,8 +33,8 @@
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                             Description
                         </label>
-                        <textarea name="description" 
-                                  id="description" 
+                        <textarea name="description"
+                                  id="description"
                                   rows="4"
                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
                         @error('description')
@@ -48,7 +48,7 @@
                             <label for="parent_id" class="block text-sm font-medium text-gray-700 mb-2">
                                 Parent Topic (Optional)
                             </label>
-                            <select name="parent_id" 
+                            <select name="parent_id"
                                     id="parent_id"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="">None (Root Topic)</option>
@@ -67,9 +67,9 @@
                             <label for="estimated_hours" class="block text-sm font-medium text-gray-700 mb-2">
                                 Estimated Hours
                             </label>
-                            <input type="number" 
-                                   name="estimated_hours" 
-                                   id="estimated_hours" 
+                            <input type="number"
+                                   name="estimated_hours"
+                                   id="estimated_hours"
                                    value="{{ old('estimated_hours') }}"
                                    min="0"
                                    step="0.5"
@@ -86,9 +86,9 @@
                             <label for="weightage" class="block text-sm font-medium text-gray-700 mb-2">
                                 Weightage (0-100)
                             </label>
-                            <input type="number" 
-                                   name="weightage" 
-                                   id="weightage" 
+                            <input type="number"
+                                   name="weightage"
+                                   id="weightage"
                                    value="{{ old('weightage', 1) }}"
                                    min="0"
                                    max="100"
@@ -103,9 +103,9 @@
                             <label for="order" class="block text-sm font-medium text-gray-700 mb-2">
                                 Order
                             </label>
-                            <input type="number" 
-                                   name="order" 
-                                   id="order" 
+                            <input type="number"
+                                   name="order"
+                                   id="order"
                                    value="{{ old('order', $roadmap->topics()->max('order') + 1) }}"
                                    min="0"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -117,11 +117,11 @@
 
                     <!-- Submit Buttons -->
                     <div class="flex items-center justify-end space-x-3">
-                        <a href="{{ route('roadmaps.show', $roadmap) }}" 
+                        <a href="{{ route('roadmaps.show', $roadmap) }}"
                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
                             Cancel
                         </a>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Add Topic
                         </button>

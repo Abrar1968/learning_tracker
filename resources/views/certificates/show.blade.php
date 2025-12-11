@@ -15,7 +15,7 @@
                     <div class="absolute top-0 right-0 w-20 h-20 border-r-4 border-t-4 border-yellow-500 rounded-tr-lg"></div>
                     <div class="absolute bottom-0 left-0 w-20 h-20 border-l-4 border-b-4 border-yellow-500 rounded-bl-lg"></div>
                     <div class="absolute bottom-0 right-0 w-20 h-20 border-r-4 border-b-4 border-yellow-500 rounded-br-lg"></div>
-                    
+
                     <!-- Header -->
                     <div class="text-center mb-8 pt-8">
                         <div class="inline-block bg-yellow-400 rounded-full p-6 mb-4">
@@ -72,7 +72,7 @@
                             <span class="text-sm text-gray-600">Verification Code: </span>
                             <span class="font-mono font-bold text-indigo-600 text-lg">{{ $certificate->verification_code }}</span>
                         </div>
-                        <a href="{{ route('certificates.verify', ['code' => $certificate->verification_code]) }}" 
+                        <a href="{{ route('certificates.verify', ['code' => $certificate->verification_code]) }}"
                            target="_blank"
                            class="text-sm text-indigo-600 hover:text-indigo-800 no-print">
                             Verify this certificate online →
@@ -99,18 +99,18 @@
 
             <!-- Actions (Hidden when printing) -->
             <div class="mt-6 flex justify-center space-x-4 no-print">
-                <button onclick="window.print()" 
+                <button onclick="window.print()"
                         class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg">
                     <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                     Print Certificate
                 </button>
-                <a href="{{ route('roadmaps.show', $certificate->roadmap) }}" 
+                <a href="{{ route('roadmaps.show', $certificate->roadmap) }}"
                    class="inline-flex items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-lg">
                     View Roadmap
                 </a>
-                <a href="{{ route('certificates.index') }}" 
+                <a href="{{ route('certificates.index') }}"
                    class="inline-flex items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-lg">
                     All Certificates
                 </a>
@@ -139,7 +139,7 @@
                 display: none !important;
             }
         }
-        
+
         @page {
             size: landscape;
             margin: 0.5in;

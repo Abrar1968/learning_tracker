@@ -52,7 +52,7 @@
                                             {{ $activity->created_at->diffForHumans() }}
                                         </p>
                                     </div>
-                                    
+
                                     <p class="text-sm text-gray-600">
                                         {{ $activity->description }}
                                     </p>
@@ -61,17 +61,17 @@
                                     @if($activity->loggable)
                                         <div class="mt-2">
                                             @if($activity->loggable_type === 'App\\Models\\Roadmap')
-                                                <a href="{{ route('roadmaps.show', $activity->loggable) }}" 
+                                                <a href="{{ route('roadmaps.show', $activity->loggable) }}"
                                                    class="text-sm text-indigo-600 hover:text-indigo-800">
                                                     View roadmap →
                                                 </a>
                                             @elseif($activity->loggable_type === 'App\\Models\\Topic')
-                                                <a href="{{ route('topics.show', $activity->loggable) }}" 
+                                                <a href="{{ route('topics.show', $activity->loggable) }}"
                                                    class="text-sm text-indigo-600 hover:text-indigo-800">
                                                     View topic →
                                                 </a>
                                             @elseif($activity->loggable_type === 'App\\Models\\Certificate')
-                                                <a href="{{ route('certificates.show', $activity->loggable) }}" 
+                                                <a href="{{ route('certificates.show', $activity->loggable) }}"
                                                    class="text-sm text-indigo-600 hover:text-indigo-800">
                                                     View certificate →
                                                 </a>
