@@ -1,99 +1,163 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Activity Feed
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-bold text-2xl text-slate-800 leading-tight">
+                {{ __('Activity Feed') }}
+            </h2>
+            <div class="text-sm text-slate-500">
+                Tracking your learning journey
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                @if($activities->isEmpty())
-                    <p class="text-gray-500 text-center py-8">No activity yet. Start learning to see your progress here!</p>
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <div class="space-y-8">
+                @if ($activities->isEmpty())
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="mt-2 text-lg font-medium text-slate-900">No activity recorded</h3>
+                        <p class="mt-1 text-slate-500">Start your learning journey to see your progress here.</p>
+                        <div class="mt-6">
+                            <a href="{{ route('roadmaps.index') }}"
+                                class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
+                                Start Learning
+                            </a>
+                        </div>
+                    </div>
                 @else
-                    <div class="space-y-6">
-                        @foreach($activities as $activity)
-                            <div class="flex items-start space-x-4 pb-6 border-b border-gray-200 last:border-0">
-                                <!-- Icon -->
-                                <div class="flex-shrink-0">
-                                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                                        @switch($activity->action)
-                                            @case('roadmap_created')
-                                                <svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                                </svg>
+                    <div class="relative">
+                        <!-- Connecting Line -->
+                        <div class="absolute top-0 bottom-0 left-8 w-px bg-slate-200"></div>
+
+                        <div class="space-y-8 relative">
+                            @foreach ($activities as $activity)
+                                <div class="relative flex items-start group">
+                                    <!-- Timeline Icon -->
+                                    <div class="flex items-center justify-center w-16 flex-shrink-0">
+                                        <div
+                                            class="relative z-10 flex items-center justify-center w-10 h-10 bg-white rounded-full border-2 border-white shadow-sm ring-1 ring-slate-200 group-hover:ring-indigo-200 transition-all">
+                                            @switch($activity->action)
+                                                @case('roadmap_created')
+                                                @case('roadmap_started')
+                                                    <div class="text-indigo-600">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                        </svg>
+                                                    </div>
                                                 @break
-                                            @case('roadmap_completed')
-                                            @case('topic_completed')
-                                                <svg class="h-6 w-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                </svg>
+
+                                                @case('roadmap_completed')
+                                                @case('topic_completed')
+
+                                                @case('resource_completed')
+                                                    <div class="text-green-600">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </div>
                                                 @break
-                                            @case('certificate_generated')
-                                                <svg class="h-6 w-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
+
+                                                @case('certificate_generated')
+                                                    <div class="text-yellow-500">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </div>
                                                 @break
-                                            @default
-                                                <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                                </svg>
-                                        @endswitch
+
+                                                @case('time_logged')
+                                                    <div class="text-blue-500">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </div>
+                                                @break
+
+                                                @default
+                                                    <div class="text-slate-500">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        </svg>
+                                                    </div>
+                                            @endswitch
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Content -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <p class="text-sm font-medium text-gray-900">
-                                            {{ ucfirst(str_replace('_', ' ', $activity->action)) }}
-                                        </p>
-                                        <p class="text-xs text-gray-500">
-                                            {{ $activity->created_at->diffForHumans() }}
-                                        </p>
-                                    </div>
+                                    <!-- Content Card -->
+                                    <div class="flex-1 min-w-0 ml-4">
+                                        <div
+                                            class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <h3 class="text-sm font-bold text-slate-900">
+                                                    {{ ucfirst(str_replace('_', ' ', $activity->action)) }}
+                                                </h3>
+                                                <span class="text-xs font-medium text-slate-400">
+                                                    {{ $activity->created_at->diffForHumans() }}
+                                                </span>
+                                            </div>
 
-                                    <p class="text-sm text-gray-600">
-                                        {{ $activity->description }}
-                                    </p>
+                                            <div class="text-sm text-slate-600 mb-3">
+                                                {{ $activity->description }}
+                                            </div>
 
-                                    <!-- Related Entity Link -->
-                                    @if($activity->loggable)
-                                        <div class="mt-2">
-                                            @if($activity->loggable_type === 'App\\Models\\Roadmap')
-                                                <a href="{{ route('roadmaps.show', $activity->loggable) }}"
-                                                   class="text-sm text-indigo-600 hover:text-indigo-800">
-                                                    View roadmap →
-                                                </a>
-                                            @elseif($activity->loggable_type === 'App\\Models\\Topic')
-                                                <a href="{{ route('topics.show', $activity->loggable) }}"
-                                                   class="text-sm text-indigo-600 hover:text-indigo-800">
-                                                    View topic →
-                                                </a>
-                                            @elseif($activity->loggable_type === 'App\\Models\\Certificate')
-                                                <a href="{{ route('certificates.show', $activity->loggable) }}"
-                                                   class="text-sm text-indigo-600 hover:text-indigo-800">
-                                                    View certificate →
-                                                </a>
+                                            @if ($activity->loggable)
+                                                <div class="flex items-center pt-3 border-t border-slate-50">
+                                                    @if ($activity->loggable_type === 'App\\Models\\Roadmap')
+                                                        <a href="{{ route('roadmaps.show', $activity->loggable) }}"
+                                                            class="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                                                            View Roadmap <svg class="ml-1 w-3 h-3" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </a>
+                                                    @elseif($activity->loggable_type === 'App\\Models\\Topic')
+                                                        <a href="{{ route('topics.show', $activity->loggable) }}"
+                                                            class="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                                                            View Topic <svg class="ml-1 w-3 h-3" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </a>
+                                                    @elseif($activity->loggable_type === 'App\\Models\\Certificate')
+                                                        <a href="{{ route('certificates.show', $activity->loggable) }}"
+                                                            class="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                                                            View Certificate <svg class="ml-1 w-3 h-3" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </a>
+                                                    @endif
+                                                </div>
                                             @endif
                                         </div>
-                                    @endif
-
-                                    <!-- Metadata -->
-                                    @if(!empty($activity->metadata))
-                                        <div class="mt-2 text-xs text-gray-500">
-                                            @foreach($activity->metadata as $key => $value)
-                                                <span class="mr-3">{{ ucfirst($key) }}: {{ $value }}</span>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="mt-6">
+                    <div class="mt-8 flex justify-center">
                         {{ $activities->links() }}
                     </div>
                 @endif
