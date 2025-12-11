@@ -1,0 +1,38 @@
+name: Label Pull Requests
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Auto-label based on files
+        uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+
+      - name: Label size
+        uses: pascalgn/size-label-action@v0.5.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          sizes: >
+            {
+              "0": "XS",
+              "20": "S",
+              "50": "M",
+              "100": "L",
+              "500": "XL",
+              "1000": "XXL"
+            }
