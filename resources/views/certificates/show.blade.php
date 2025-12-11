@@ -1,11 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-slate-800 leading-tight print:hidden">
-            {{ __('Certificate of Completion') }}
-        </h2>
+        <div class="flex items-center justify-between print:hidden">
+            <div>
+                <h2 class="font-black text-3xl text-gray-900 leading-tight">
+                    {{ __('Certificate of Completion') }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-600">Achievement unlocked!</p>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-12 print:p-0">
+    <div class="py-12 print:p-0 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen print:bg-white">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 print:max-w-full print:px-0">
             <!-- Certificate Container -->
             <div class="relative bg-white text-slate-900 shadow-2xl overflow-hidden print:shadow-none print:w-full print:h-screen"
@@ -104,15 +109,15 @@
             <!-- Actions -->
             <div class="mt-8 flex justify-center gap-4 print:hidden">
                 <button onclick="window.print()"
-                    class="inline-flex items-center px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transition transform hover:-translate-y-0.5">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold rounded-2xl shadow-2xl shadow-slate-300 transition-all transform hover:-translate-y-1 hover:shadow-3xl">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                     Print Certificate
                 </button>
                 <a href="{{ route('certificates.index') }}"
-                    class="inline-flex items-center px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl shadow-sm transition">
+                    class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 hover:border-indigo-400 hover:from-indigo-100 hover:to-purple-100 text-indigo-700 font-bold rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 hover:shadow-xl">
                     Back to All
                 </a>
             </div>

@@ -1,34 +1,42 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-slate-800 leading-tight">
-            {{ __('My Certificates') }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="font-black text-3xl text-gray-900 leading-tight">
+                    {{ __('My Certificates') }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-600">Your achievements and milestones</p>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if ($certificates->isEmpty())
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
-                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                        </svg>
-                    </div>
-                    <h3 class="mt-2 text-lg font-medium text-slate-900">No certificates earned yet</h3>
-                    <p class="mt-1 text-slate-500">Complete roadmaps to earn your first certificate.</p>
-                    <div class="mt-6">
-                        <a href="{{ route('roadmaps.index') }}"
-                            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
-                            Explore Roadmaps
-                        </a>
+                <div class="relative bg-white rounded-3xl shadow-2xl border-t-4 border-gradient-to-r from-yellow-400 via-orange-500 to-red-500 p-12 text-center overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-yellow-50/30 to-orange-50/30"></div>
+                    <div class="relative z-10">
+                        <div class="w-20 h-20 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                            <svg class="h-10 w-10 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                        </div>
+                        <h3 class="mt-2 text-2xl font-black text-slate-900">No certificates earned yet</h3>
+                        <p class="mt-1 text-slate-600">Complete roadmaps to earn your first certificate.</p>
+                        <div class="mt-6">
+                            <a href="{{ route('roadmaps.index') }}"
+                                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-xl font-bold text-sm text-white uppercase tracking-widest hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all shadow-xl hover:shadow-2xl">
+                                Explore Roadmaps
+                            </a>
+                        </div>
                     </div>
                 </div>
             @else
-                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     @foreach ($certificates as $certificate)
                         <div
-                            class="relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 overflow-hidden group">
+                            class="relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-slate-200 overflow-hidden group transform hover:scale-105 hover:-translate-y-2">
                             <!-- Premium Top Border/Gradient -->
                             <div class="h-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500"></div>
 
@@ -84,12 +92,12 @@
                                 <!-- Actions -->
                                 <div class="relative flex gap-3">
                                     <a href="{{ route('certificates.show', $certificate) }}"
-                                        class="flex-1 text-center bg-white border border-slate-200 hover:border-indigo-600 hover:text-indigo-600 text-slate-700 font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-sm">
+                                        class="flex-1 text-center bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 hover:border-indigo-600 hover:from-indigo-100 hover:to-purple-100 text-indigo-700 font-bold py-2.5 px-4 rounded-xl text-sm transition-all shadow-md hover:shadow-lg transform hover:scale-105">
                                         View
                                     </a>
                                     <button
                                         onclick="window.open('{{ route('certificates.show', $certificate) }}').print()"
-                                        class="flex-1 text-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg hover:shadow-xl">
+                                        class="flex-1 text-center bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-all shadow-xl hover:shadow-2xl transform hover:scale-105">
                                         Print
                                     </button>
                                 </div>

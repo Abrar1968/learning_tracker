@@ -25,53 +25,61 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             <!-- Roadmap Stats Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Progress</div>
-                    <div class="flex items-end gap-2">
-                        <div class="text-3xl font-bold text-indigo-600">
-                            {{ number_format($roadmap->progress_percentage, 0) }}<span class="text-lg">%</span></div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="group bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl overflow-hidden relative">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+                    <div class="relative z-10">
+                        <div class="text-xs font-bold text-indigo-100 uppercase tracking-wider mb-3">Progress</div>
+                        <div class="flex items-end gap-2">
+                            <div class="text-4xl font-black text-white">
+                                {{ number_format($roadmap->progress_percentage, 0) }}<span class="text-xl">%</span></div>
+                        </div>
+                        <div class="w-full bg-white bg-opacity-20 rounded-full h-2 mt-4 overflow-hidden">
+                            <div class="bg-white h-2 rounded-full transition-all duration-1000 ease-out"
+                                style="width: {{ $roadmap->progress_percentage }}%"></div>
+                        </div>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-1.5 mt-3">
-                        <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-500"
-                            style="width: {{ $roadmap->progress_percentage }}%"></div>
+                </div>
+                <div class="group bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+                    <div class="relative z-10">
+                        <div class="text-xs font-bold text-green-100 uppercase tracking-wider mb-3">Topics</div>
+                        <div class="text-4xl font-black text-white">{{ $roadmap->completed_topics }}<span
+                                class="text-white text-opacity-60 text-2xl font-bold">/{{ $roadmap->total_topics }}</span></div>
                     </div>
                 </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Topics</div>
-                    <div class="text-3xl font-bold text-slate-900">{{ $roadmap->completed_topics }}<span
-                            class="text-slate-400 text-xl font-medium">/{{ $roadmap->total_topics }}</span></div>
+                <div class="group bg-gradient-to-br from-blue-500 to-cyan-600 rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+                    <div class="relative z-10">
+                        <div class="text-xs font-bold text-blue-100 uppercase tracking-wider mb-3">Status</div>
+                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-white {{ $roadmap->status === 'completed' ? 'text-green-700' : ($roadmap->status === 'in_progress' ? 'text-blue-700' : 'text-gray-700') }} shadow-lg">
+                            {{ ucfirst(str_replace('_', ' ', $roadmap->status)) }}
+                        </span>
+                    </div>
                 </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</div>
-                    <span
-                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium border
-                        @if ($roadmap->status === 'completed') bg-green-50 text-green-700 border-green-200
-                        @elseif($roadmap->status === 'in_progress') bg-blue-50 text-blue-700 border-blue-200
-                        @else bg-slate-50 text-slate-700 border-slate-200 @endif">
-                        {{ ucfirst(str_replace('_', ' ', $roadmap->status)) }}
-                    </span>
-                </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Started</div>
-                    <div class="text-xl font-bold text-slate-900">
-                        @if ($roadmap->start_date)
-                            {{ $roadmap->start_date->format('M d, Y') }}
-                        @else
-                            <span class="text-slate-400 font-normal text-base">Not started</span>
-                        @endif
+                <div class="group bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+                    <div class="relative z-10">
+                        <div class="text-xs font-bold text-orange-100 uppercase tracking-wider mb-3">Started</div>
+                        <div class="text-xl font-bold text-white">
+                            @if ($roadmap->start_date)
+                                {{ $roadmap->start_date->format('M d, Y') }}
+                            @else
+                                <span class="text-white text-opacity-80 font-normal text-base">Not started</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Topics List -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 class="font-bold text-lg text-slate-800">Curriculum</h3>
-                    <span class="text-sm text-slate-500">{{ $roadmap->topics->count() }} modules</span>
+            <div class="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+                <div class="p-8 border-b-2 border-gray-100 bg-gradient-to-r from-indigo-50 to-purple-50 flex justify-between items-center">
+                    <h3 class="font-black text-2xl text-gray-900">Curriculum</h3>
+                    <span class="text-sm font-bold text-indigo-600 bg-white px-4 py-2 rounded-full shadow-md">{{ $roadmap->topics->count() }} modules</span>
                 </div>
 
                 @if ($roadmap->topics->isEmpty())
@@ -93,13 +101,13 @@
                 @else
                     <div class="divide-y divide-slate-100">
                         @foreach ($roadmap->topics()->whereNull('parent_id')->orderBy('order')->get() as $topic)
-                            <div class="p-6 hover:bg-slate-50 transition-colors group">
+                            <div class="p-6 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-all duration-300 group border-l-4 border-transparent hover:border-indigo-500 hover:shadow-lg">
                                 <div class="flex items-start gap-4">
                                     <!-- Status Icon -->
                                     <div class="flex-shrink-0 mt-1">
                                         @if ($topic->status === 'completed')
                                             <div
-                                                class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                                class="w-10 h-10 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center text-green-600 shadow-md ring-2 ring-green-200/50">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -108,7 +116,7 @@
                                             </div>
                                         @elseif($topic->status === 'in_progress')
                                             <div
-                                                class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                                class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center text-blue-600 shadow-md ring-2 ring-blue-200/50 animate-pulse">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -120,16 +128,16 @@
                                             </div>
                                         @else
                                             <div
-                                                class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                                class="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-gray-100 flex items-center justify-center text-slate-500 shadow-md ring-2 ring-slate-200/50">
                                                 <span class="font-bold text-xs">{{ $loop->iteration }}</span>
                                             </div>
                                         @endif
                                     </div>
 
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between mb-1">
+                                        <div class="flex items-center justify-between mb-2">
                                             <h4
-                                                class="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                                                class="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
                                                 <a href="{{ route('topics.show', $topic) }}">
                                                     {{ $topic->title }}
                                                 </a>
@@ -164,23 +172,23 @@
                                                 {{ Str::limit($topic->description, 150) }}</p>
                                         @endif
 
-                                        <div class="flex items-center gap-4 text-xs font-medium text-slate-500">
+                                        <div class="flex items-center gap-4 text-xs font-bold text-slate-600">
                                             @if ($topic->estimated_hours)
-                                                <span class="flex items-center gap-1"><svg class="w-4 h-4"
+                                                <span class="flex items-center gap-1 bg-gradient-to-r from-blue-50 to-cyan-50 px-3 py-1.5 rounded-full"><svg class="w-4 h-4"
                                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg> {{ $topic->estimated_hours }}h</span>
                                             @endif
-                                            <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="none"
+                                            <span class="flex items-center gap-1 bg-gradient-to-r from-purple-50 to-pink-50 px-3 py-1.5 rounded-full"><svg class="w-4 h-4" fill="none"
                                                     stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
                                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg> {{ $topic->resources->count() }} resources</span>
                                             @if ($topic->children->count() > 0)
-                                                <span class="flex items-center gap-1"><svg class="w-4 h-4"
+                                                <span class="flex items-center gap-1 bg-gradient-to-r from-green-50 to-emerald-50 px-3 py-1.5 rounded-full"><svg class="w-4 h-4"
                                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
@@ -189,9 +197,13 @@
                                         </div>
                                         <!-- Topic Progress -->
                                         @if ($topic->progress && $topic->progress->getProgressPercentage() > 0)
-                                            <div class="mt-3 max-w-xs">
-                                                <div class="w-full bg-slate-200 rounded-full h-1">
-                                                    <div class="bg-green-500 h-1 rounded-full"
+                                            <div class="mt-4 max-w-md">
+                                                <div class="flex items-center justify-between text-xs font-bold text-slate-600 mb-1">
+                                                    <span>Progress</span>
+                                                    <span class="text-indigo-600">{{ $topic->progress->getProgressPercentage() }}%</span>
+                                                </div>
+                                                <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden shadow-inner">
+                                                    <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-2 rounded-full transition-all duration-1000 ease-out"
                                                         style="width: {{ $topic->progress->getProgressPercentage() }}%">
                                                     </div>
                                                 </div>
@@ -202,11 +214,11 @@
 
                                 <!-- Subtopics Preview -->
                                 @if ($topic->children->count() > 0)
-                                    <div class="mt-4 pl-12 border-l-2 border-slate-100 ml-4 space-y-2">
+                                    <div class="mt-4 pl-12 border-l-2 border-gradient-to-b from-indigo-200 to-purple-200 ml-4 space-y-2">
                                         @foreach ($topic->children()->orderBy('order')->take(3)->get() as $subtopic)
                                             <a href="{{ route('topics.show', $subtopic) }}"
-                                                class="block p-2 rounded hover:bg-white text-sm text-slate-600 hover:text-indigo-600 transition-colors">
-                                                <span class="mr-2 text-slate-400">•</span> {{ $subtopic->title }}
+                                                class="block p-3 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 text-sm font-semibold text-slate-700 hover:text-indigo-700 transition-all hover:shadow-md hover:pl-4">
+                                                <span class="mr-2 text-indigo-400 text-lg">›</span> {{ $subtopic->title }}
                                             </a>
                                         @endforeach
                                         @if ($topic->children->count() > 3)

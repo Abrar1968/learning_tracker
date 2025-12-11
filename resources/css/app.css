@@ -11,3 +11,252 @@
         @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors;
     }
 }
+
+@layer utilities {
+    /* Custom Gradient Animations */
+    @keyframes gradient-x {
+        0%, 100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    @keyframes gradient-y {
+        0%, 100% {
+            background-position: 50% 0%;
+        }
+        50% {
+            background-position: 50% 100%;
+        }
+    }
+
+    @keyframes gradient-xy {
+        0%, 100% {
+            background-position: 0% 0%;
+        }
+        25% {
+            background-position: 100% 0%;
+        }
+        50% {
+            background-position: 100% 100%;
+        }
+        75% {
+            background-position: 0% 100%;
+        }
+    }
+
+    /* Floating Animation */
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    /* Pulse Glow Animation */
+    @keyframes pulse-glow {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.8);
+        }
+    }
+
+    /* Shimmer Effect */
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+
+    /* Slide Up Animation */
+    @keyframes slide-up {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Rotate In Animation */
+    @keyframes rotate-in {
+        from {
+            opacity: 0;
+            transform: rotate(-10deg) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+    }
+
+    /* Progress Bar Fill Animation */
+    @keyframes progress-fill {
+        from {
+            width: 0%;
+        }
+    }
+
+    /* Bounce In Animation */
+    @keyframes bounce-in {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Fade In Animation */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Scale In Animation */
+    @keyframes scale-in {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Apply Animation Classes */
+    .animate-gradient-x {
+        animation: gradient-x 15s ease infinite;
+        background-size: 200% 200%;
+    }
+
+    .animate-gradient-y {
+        animation: gradient-y 15s ease infinite;
+        background-size: 200% 200%;
+    }
+
+    .animate-gradient-xy {
+        animation: gradient-xy 15s ease infinite;
+        background-size: 200% 200%;
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .animate-shimmer {
+        animation: shimmer 2s linear infinite;
+        background: linear-gradient(
+            to right,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%
+        );
+        background-size: 1000px 100%;
+    }
+
+    .animate-slide-up {
+        animation: slide-up 0.6s ease-out;
+    }
+
+    .animate-rotate-in {
+        animation: rotate-in 0.6s ease-out;
+    }
+
+    .animate-progress-fill {
+        animation: progress-fill 1s ease-out;
+    }
+
+    .animate-bounce-in {
+        animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out;
+    }
+
+    .animate-scale-in {
+        animation: scale-in 0.5s ease-out;
+    }
+
+    /* Delay Utilities */
+    .animation-delay-100 {
+        animation-delay: 100ms;
+    }
+
+    .animation-delay-200 {
+        animation-delay: 200ms;
+    }
+
+    .animation-delay-300 {
+        animation-delay: 300ms;
+    }
+
+    .animation-delay-500 {
+        animation-delay: 500ms;
+    }
+
+    .animation-delay-700 {
+        animation-delay: 700ms;
+    }
+
+    /* Gradient Text */
+    .text-gradient {
+        background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Glass Morphism */
+    .glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Enhanced Shadows */
+    .shadow-glow-indigo {
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+
+    .shadow-glow-purple {
+        box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+    }
+
+    .shadow-glow-green {
+        box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+    }
+
+    .shadow-glow-yellow {
+        box-shadow: 0 0 30px rgba(234, 179, 8, 0.5);
+    }
+}
