@@ -50,7 +50,7 @@
     </div>
 @endif
 
-@if ($errors->any())
+@if (isset($errors) && $errors->any())
     <div x-data="{ show: true }"
          x-show="show"
          x-transition

@@ -11,7 +11,7 @@ class CertificateController extends Controller
     public function __construct(
         protected CertificateService $certificateService
     ) {
-        $this->middleware('auth')->except(['verify']);
+        //
     }
 
     /**

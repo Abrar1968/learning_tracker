@@ -6,15 +6,18 @@ use App\Http\Requests\StoreTopicRequest;
 use App\Http\Requests\UpdateTopicRequest;
 use App\Models\Roadmap;
 use App\Models\Topic;
+use App\Services\AttachmentService;
 use App\Services\TopicService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TopicController extends Controller
 {
     public function __construct(
-        protected TopicService $topicService
+        protected TopicService $topicService,
+        protected AttachmentService $attachmentService
     ) {
-        $this->middleware('auth');
+        //
     }
 
     /**
@@ -51,6 +54,13 @@ class TopicController extends Controller
             $request->validated()
         );
 
+        // Handle file uploads
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $this->attachmentService->attachFile($topic, $file, $request->user()->id);
+            }
+        }
+
         return redirect()
             ->route('roadmaps.show', $roadmap)
             ->with('success', 'Topic created successfully!');
@@ -59,8 +69,15 @@ class TopicController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Roadmap $roadmap, Topic $topic)
+    public function show(?Roadmap $roadmap, ?Topic $topic = null)
     {
+        // Handle standalone route where first param is actually the topic
+        if ($roadmap instanceof Topic) {
+            $topic = $roadmap;
+            $roadmap = $topic->roadmap;
+        }
+
+        Gate::authorize('view', $topic);
         $topic->load(['resources', 'progress']);
 
         return view('topics.show', compact('roadmap', 'topic'));
@@ -89,6 +106,13 @@ class TopicController extends Controller
             $request->validated()
         );
 
+        // Handle file uploads
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $this->attachmentService->attachFile($topic, $file, $request->user()->id);
+            }
+        }
+
         return redirect()
             ->route('topics.show', [$roadmap, $topic])
             ->with('success', 'Topic updated successfully!');
@@ -97,8 +121,15 @@ class TopicController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Roadmap $roadmap, Topic $topic)
+    public function destroy(?Roadmap $roadmap, ?Topic $topic = null)
     {
+        // Handle standalone route where first param is actually the topic
+        if ($roadmap instanceof Topic) {
+            $topic = $roadmap;
+            $roadmap = $topic->roadmap;
+        }
+
+        Gate::authorize('delete', $topic);
         $this->topicService->deleteTopic($topic);
 
         return redirect()

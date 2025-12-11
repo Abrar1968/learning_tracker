@@ -15,7 +15,7 @@
                     <h3 class="text-2xl font-black">Update Roadmap</h3>
                     <p class="text-indigo-100 text-sm mt-1">Modify the details below</p>
                 </div>
-                <form action="{{ route('roadmaps.update', $roadmap) }}" method="POST" class="p-8 space-y-6">
+                <form action="{{ route('roadmaps.update', $roadmap) }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
                     @csrf
                     @method('PUT')
 
@@ -120,6 +120,19 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+                    </div>
+
+                    <!-- File Attachments -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-3">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                </svg>
+                                Attachments
+                            </span>
+                        </label>
+                        <x-file-upload :existingFiles="$roadmap->attachments" />
                     </div>
 
                     <!-- Submit Buttons -->

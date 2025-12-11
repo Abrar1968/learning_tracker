@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRoadmapRequest;
 use App\Http\Requests\UpdateRoadmapRequest;
 use App\Models\Roadmap;
+use App\Services\AttachmentService;
 use App\Services\RoadmapService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RoadmapController extends Controller
 {
     public function __construct(
-        protected RoadmapService $roadmapService
+        protected RoadmapService $roadmapService,
+        protected AttachmentService $attachmentService
     ) {
-        $this->middleware('auth');
+        //
     }
 
     /**
@@ -21,10 +24,15 @@ class RoadmapController extends Controller
      */
     public function index(Request $request)
     {
-        $status = $request->query('status');
+        $filters = [];
+
+        if ($status = $request->query('status')) {
+            $filters['status'] = $status;
+        }
+
         $roadmaps = $this->roadmapService->getUserRoadmaps(
             $request->user(),
-            $status
+            $filters
         );
 
         return view('roadmaps.index', compact('roadmaps'));
@@ -48,6 +56,13 @@ class RoadmapController extends Controller
             $request->validated()
         );
 
+        // Handle file uploads
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $this->attachmentService->attachFile($roadmap, $file, $request->user()->id);
+            }
+        }
+
         return redirect()
             ->route('roadmaps.show', $roadmap)
             ->with('success', 'Roadmap created successfully!');
@@ -58,7 +73,7 @@ class RoadmapController extends Controller
      */
     public function show(Roadmap $roadmap)
     {
-        $this->authorize('view', $roadmap);
+        Gate::authorize('view', $roadmap);
 
         $roadmap->load(['topics' => function ($query) {
             $query->rootTopics()->ordered()->with('children');
@@ -74,7 +89,7 @@ class RoadmapController extends Controller
      */
     public function edit(Roadmap $roadmap)
     {
-        $this->authorize('update', $roadmap);
+        Gate::authorize('update', $roadmap);
 
         return view('roadmaps.edit', compact('roadmap'));
     }
@@ -89,6 +104,13 @@ class RoadmapController extends Controller
             $request->validated()
         );
 
+        // Handle file uploads
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $this->attachmentService->attachFile($roadmap, $file, $request->user()->id);
+            }
+        }
+
         return redirect()
             ->route('roadmaps.show', $roadmap)
             ->with('success', 'Roadmap updated successfully!');
@@ -99,7 +121,7 @@ class RoadmapController extends Controller
      */
     public function destroy(Roadmap $roadmap)
     {
-        $this->authorize('delete', $roadmap);
+        Gate::authorize('delete', $roadmap);
 
         $this->roadmapService->deleteRoadmap($roadmap);
 

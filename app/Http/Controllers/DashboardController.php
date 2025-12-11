@@ -18,7 +18,7 @@ class DashboardController extends Controller
             'completed_roadmaps' => $user->roadmaps()->where('status', 'completed')->count(),
             'certificates_earned' => $user->certificates()->count(),
             'time_spent_hours' => $user->topicProgress()
-                ->sum(DB::raw('COALESCE(time_spent_minutes, 0)')) / 60,
+                ->sum(DB::raw('COALESCE(time_spent, 0)')) / 60,
         ];
 
         // Format time spent to show as integer

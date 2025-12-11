@@ -2,40 +2,45 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                <h2 class="font-black text-3xl text-gray-900 leading-tight">
                     {{ $topic->title }}
                 </h2>
                 <p class="text-sm text-gray-600 mt-1">
-                    <a href="{{ route('roadmaps.show', $topic->roadmap) }}" class="hover:text-indigo-600">
-                        {{ $topic->roadmap->title }}
+                    <a href="{{ route('roadmaps.show', $topic->roadmap) }}" class="hover:text-indigo-600 font-semibold">
+                        ← {{ $topic->roadmap->title }}
                     </a>
                 </p>
             </div>
-            <div class="flex space-x-2">
+            <div class="flex space-x-3">
                 <a href="{{ route('resources.create', ['topic_id' => $topic->id]) }}"
-                   class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm">
-                    Add Resource
+                   class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl text-sm shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Resource
+                    </span>
                 </a>
                 <a href="{{ route('topics.edit', $topic) }}"
-                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded text-sm">
+                   class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all transform hover:scale-105">
                     Edit
                 </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Topic Details -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                @if($topic->status === 'completed') bg-green-100 text-green-800
-                                @elseif($topic->status === 'in_progress') bg-blue-100 text-blue-800
-                                @else bg-gray-100 text-gray-800
+                    <div class="bg-white overflow-hidden shadow-xl rounded-3xl p-8 border border-gray-200">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold shadow-md
+                                @if($topic->status === 'completed') bg-gradient-to-r from-green-500 to-emerald-600 text-white
+                                @elseif($topic->status === 'in_progress') bg-gradient-to-r from-blue-500 to-cyan-600 text-white
+                                @else bg-gradient-to-r from-gray-400 to-gray-500 text-white
                                 @endif">
                                 {{ ucfirst(str_replace('_', ' ', $topic->status)) }}
                             </span>
@@ -76,15 +81,20 @@
                     </div>
 
                     <!-- Resources -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-semibold mb-4">Resources ({{ $topic->resources->count() }})</h3>
+                    <div class="bg-white overflow-hidden shadow-xl rounded-3xl p-8 border border-gray-200">
+                        <h3 class="text-2xl font-black mb-6 text-gray-900">Resources ({{ $topic->resources->count() }})</h3>
 
                         @if($topic->resources->isEmpty())
-                            <p class="text-gray-500 text-center py-4">No resources yet.</p>
+                            <div class="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+                                <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <p class="text-gray-500 font-semibold">No resources yet</p>
+                            </div>
                         @else
-                            <div class="space-y-3">
+                            <div class="space-y-4">
                                 @foreach($topic->resources as $resource)
-                                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition">
+                                    <div class="relative border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:border-indigo-300 hover:-translate-y-1 group bg-gradient-to-br from-white to-gray-50">
                                         <div class="flex items-start justify-between">
                                             <div class="flex-1">
                                                 <div class="flex items-center space-x-2 mb-2">
@@ -193,15 +203,15 @@
 
                     <!-- Subtopics -->
                     @if($topic->children->count() > 0)
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-4">Subtopics ({{ $topic->children->count() }})</h3>
+                        <div class="bg-white overflow-hidden shadow-xl rounded-3xl p-8 border border-gray-200">
+                            <h3 class="text-2xl font-black mb-6 text-gray-900">Subtopics ({{ $topic->children->count() }})</h3>
                             <div class="space-y-3">
                                 @foreach($topic->children()->orderBy('order')->get() as $subtopic)
-                                    <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="border-2 border-gray-200 rounded-2xl p-5 hover:shadow-lg transition-all hover:border-indigo-300 hover:-translate-y-1 bg-gradient-to-br from-white to-gray-50">
                                         <div class="flex items-center justify-between">
                                             <div>
                                                 <a href="{{ route('topics.show', $subtopic) }}"
-                                                   class="text-gray-900 hover:text-indigo-600 font-medium">
+                                                   class="text-gray-900 hover:text-indigo-600 font-bold text-lg">
                                                     {{ $subtopic->title }}
                                                 </a>
                                                 <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
@@ -227,17 +237,22 @@
                 <!-- Sidebar -->
                 <div class="space-y-6">
                     <!-- Progress Card -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-semibold mb-4">Progress</h3>
+                    <div class="bg-white overflow-hidden shadow-xl rounded-3xl p-6 border border-gray-200">
+                        <h3 class="text-xl font-black mb-6 text-gray-900 flex items-center">
+                            <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Progress
+                        </h3>
 
                         @if($topic->progress)
-                            <div class="mb-4">
-                                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                            <div class="mb-6">
+                                <div class="flex justify-between text-sm font-bold text-gray-700 mb-2">
                                     <span>Completion</span>
-                                    <span class="font-semibold">{{ $topic->progress->getProgressPercentage() }}%</span>
+                                    <span class="text-indigo-600 text-lg">{{ $topic->progress->getProgressPercentage() }}%</span>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-3">
-                                    <div class="bg-indigo-600 h-3 rounded-full transition-all"
+                                <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+                                    <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-1000 ease-out"
                                          style="width: {{ $topic->progress->getProgressPercentage() }}%"></div>
                                 </div>
                             </div>
@@ -289,7 +304,7 @@
                                                    required
                                                    class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
                                             <button type="submit"
-                                                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
+                                                    class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-lg transition-all">
                                                 Log Time
                                             </button>
                                         </div>
@@ -300,7 +315,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit"
-                                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm">
+                                                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-lg transition-all">
                                             Update Progress
                                         </button>
                                     </form>
@@ -311,7 +326,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit"
-                                                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm">
+                                                class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-lg transition-all">
                                             Complete Topic
                                         </button>
                                     </form>
@@ -328,8 +343,14 @@
                             <form action="{{ route('progress.start', $topic) }}" method="POST">
                                 @csrf
                                 <button type="submit"
-                                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded">
-                                    Start Learning
+                                        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-4 rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-105">
+                                    <span class="flex items-center justify-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Start Learning
+                                    </span>
                                 </button>
                             </form>
                         @endif

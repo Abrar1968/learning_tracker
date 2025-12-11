@@ -24,8 +24,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Topics - Nested under Roadmaps
     Route::resource('roadmaps.topics', TopicController::class)->except(['index']);
 
+    // Topics - Standalone routes for viewing only (create/edit stay nested)
+    Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
+    Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
+
     // Resources - Nested under Topics
     Route::resource('topics.resources', ResourceController::class)->except(['index']);
+
+    // Resources - Standalone routes for direct access
+    Route::get('/resources/create', [ResourceController::class, 'create'])->name('resources.create');
+    Route::post('/resources', [ResourceController::class, 'store'])->name('resources.store');
+    Route::get('/resources/{resource}/edit', [ResourceController::class, 'edit'])->name('resources.edit');
+    Route::put('/resources/{resource}', [ResourceController::class, 'update'])->name('resources.update');
+    Route::delete('/resources/{resource}', [ResourceController::class, 'destroy'])->name('resources.destroy');
 
     // Progress Routes
     Route::post('/topics/{topic}/progress/start', [ProgressController::class, 'start'])
@@ -53,6 +64,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Attachment Routes
+    Route::delete('/attachments/{attachment}', [App\Http\Controllers\AttachmentController::class, 'destroy'])
+        ->name('attachments.destroy');
 });
 
 // Public Certificate Verification Route

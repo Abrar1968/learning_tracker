@@ -58,6 +58,11 @@ class Roadmap extends Model
         return $this->morphMany(ActivityLog::class, 'loggable');
     }
 
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
     // Scopes
     public function scopeActive($query)
     {

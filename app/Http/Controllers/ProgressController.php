@@ -11,7 +11,7 @@ class ProgressController extends Controller
     public function __construct(
         protected ProgressService $progressService
     ) {
-        $this->middleware('auth');
+        //
     }
 
     /**
