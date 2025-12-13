@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layouts.app-with-sidebar>
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
@@ -12,6 +12,15 @@
                 </p>
             </div>
             <div class="flex space-x-3">
+                <a href="{{ route('roadmaps.topics.create', ['roadmap' => $topic->roadmap, 'parent_id' => $topic->id]) }}"
+                   class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl text-sm shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                        </svg>
+                        Add Subtopic
+                    </span>
+                </a>
                 <a href="{{ route('resources.create', ['topic_id' => $topic->id]) }}"
                    class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl text-sm shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                     <span class="flex items-center">
@@ -21,7 +30,7 @@
                         Add Resource
                     </span>
                 </a>
-                <a href="{{ route('topics.edit', $topic) }}"
+                <a href="{{ route('roadmaps.topics.edit', [$topic->roadmap, $topic]) }}"
                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all transform hover:scale-105">
                     Edit
                 </a>
@@ -290,11 +299,10 @@
                             <div class="space-y-2">
                                 @if(!$topic->progress->isCompleted())
                                     <!-- Log Time Form -->
-                                    <form action="{{ route('progress.log-time', $topic->progress) }}" method="POST"
+                                    <form action="{{ route('progress.logTime', $topic) }}" method="POST"
                                           x-data="{ minutes: '' }"
                                           @submit.prevent="if(minutes) $el.submit()">
                                         @csrf
-                                        @method('PATCH')
                                         <div class="flex space-x-2">
                                             <input type="number"
                                                    name="minutes"
@@ -311,9 +319,9 @@
                                     </form>
 
                                     <!-- Update Progress Form -->
-                                    <form action="{{ route('progress.update', $topic->progress) }}" method="POST">
+                                    <form action="{{ route('progress.update', $topic) }}" method="POST">
                                         @csrf
-                                        @method('PATCH')
+                                        @method('PUT')
                                         <button type="submit"
                                                 class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-lg transition-all">
                                             Update Progress
@@ -321,10 +329,9 @@
                                     </form>
 
                                     <!-- Complete Topic -->
-                                    <form action="{{ route('progress.complete', $topic->progress) }}" method="POST"
+                                    <form action="{{ route('progress.complete', $topic) }}" method="POST"
                                           onsubmit="return confirm('Mark this topic as completed?');">
                                         @csrf
-                                        @method('PATCH')
                                         <button type="submit"
                                                 class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-lg transition-all">
                                             Complete Topic
@@ -359,4 +366,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app-with-sidebar>

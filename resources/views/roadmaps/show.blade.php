@@ -1,4 +1,8 @@
-<x-app-layout>
+<x-layouts.app-with-sidebar>
+    @if(session('milestone'))
+        <div data-milestone="{{ session('milestone') }}"></div>
+    @endif
+
     <x-slot name="header">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -10,7 +14,7 @@
                 @endif
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('topics.create', ['roadmap_id' => $roadmap->id]) }}"
+                <a href="{{ route('roadmaps.topics.create', $roadmap) }}"
                     class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition shadow-sm">
                     <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -93,16 +97,24 @@
                         </div>
                         <h4 class="text-lg font-medium text-slate-900">No topics yet</h4>
                         <p class="text-slate-500 mb-6">Add your first topic to start building this roadmap.</p>
-                        <a href="{{ route('topics.create', ['roadmap_id' => $roadmap->id]) }}"
+                        <a href="{{ route('roadmaps.topics.create', $roadmap) }}"
                             class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
                             Add First Topic
                         </a>
                     </div>
                 @else
-                    <div class="divide-y divide-slate-100">
+                    <!-- Topics List with Drag & Drop -->
+                    <div class="divide-y divide-slate-100" data-sortable="topics" data-roadmap-id="{{ $roadmap->id }}">
                         @foreach ($roadmap->topics()->whereNull('parent_id')->orderBy('order')->get() as $topic)
-                            <div class="p-6 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-all duration-300 group border-l-4 border-transparent hover:border-indigo-500 hover:shadow-lg">
+                            <div class="p-6 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-all duration-300 group border-l-4 border-transparent hover:border-indigo-500 hover:shadow-lg" data-topic-id="{{ $topic->id }}">
                                 <div class="flex items-start gap-4">
+                                    <!-- Drag Handle -->
+                                    <div class="flex-shrink-0 mt-1 drag-handle cursor-move opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg class="w-6 h-6 text-gray-400 hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+                                        </svg>
+                                    </div>
+
                                     <!-- Status Icon -->
                                     <div class="flex-shrink-0 mt-1">
                                         @if ($topic->status === 'completed')
@@ -144,8 +156,18 @@
                                             </h4>
                                             <div
                                                 class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <a href="{{ route('roadmaps.topics.create', ['roadmap' => $roadmap, 'parent_id' => $topic->id]) }}"
+                                                    class="p-1 text-slate-400 hover:text-green-600 rounded"
+                                                    title="Add Subtopic">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                </a>
                                                 <a href="{{ route('topics.show', $topic) }}"
-                                                    class="p-1 text-slate-400 hover:text-indigo-600 rounded">
+                                                    class="p-1 text-slate-400 hover:text-indigo-600 rounded"
+                                                    title="View Topic">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -155,8 +177,9 @@
                                                             d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
                                                 </a>
-                                                <a href="{{ route('topics.edit', $topic) }}"
-                                                    class="p-1 text-slate-400 hover:text-indigo-600 rounded">
+                                                <a href="{{ route('roadmaps.topics.edit', [$roadmap, $topic]) }}"
+                                                    class="p-1 text-slate-400 hover:text-indigo-600 rounded"
+                                                    title="Edit Topic">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -273,4 +296,4 @@
             @endif
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app-with-sidebar>

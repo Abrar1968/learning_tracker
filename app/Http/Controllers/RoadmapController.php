@@ -129,4 +129,21 @@ class RoadmapController extends Controller
             ->route('roadmaps.index')
             ->with('success', 'Roadmap deleted successfully!');
     }
+
+    /**
+     * Fork a roadmap for the current user
+     */
+    public function fork(Roadmap $roadmap)
+    {
+        // Can only fork public roadmaps or own roadmaps
+        if (!$roadmap->is_public && $roadmap->user_id !== auth()->id()) {
+            abort(403, 'This roadmap is not available for forking.');
+        }
+
+        $fork = $roadmap->forkForUser(auth()->user());
+
+        return redirect()
+            ->route('roadmaps.show', $fork)
+            ->with('success', "Roadmap forked successfully! This is now your personal copy of '{$roadmap->title}'.");
+    }
 }

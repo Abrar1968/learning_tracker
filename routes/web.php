@@ -1,12 +1,18 @@
 <?php
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FocusSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoadmapController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\TopicController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/resources', [ResourceController::class, 'store'])->name('resources.store');
     Route::get('/resources/{resource}/edit', [ResourceController::class, 'edit'])->name('resources.edit');
     Route::put('/resources/{resource}', [ResourceController::class, 'update'])->name('resources.update');
+    Route::patch('/resources/{resource}/complete', [ResourceController::class, 'complete'])->name('resources.complete');
     Route::delete('/resources/{resource}', [ResourceController::class, 'destroy'])->name('resources.destroy');
 
     // Progress Routes
@@ -60,6 +67,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/activities', [ActivityController::class, 'index'])
         ->name('activities.index');
 
+    // Search Route
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    // Topic Reordering Route
+    Route::post('/roadmaps/{roadmap}/topics/reorder', [TopicController::class, 'reorder'])
+        ->name('topics.reorder');
+
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -68,6 +82,49 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Attachment Routes
     Route::delete('/attachments/{attachment}', [App\Http\Controllers\AttachmentController::class, 'destroy'])
         ->name('attachments.destroy');
+
+    // Template Gallery Routes
+    Route::get('/templates', [TemplateController::class, 'index'])->name('templates.index');
+    Route::get('/templates/{template}', [TemplateController::class, 'show'])->name('templates.show');
+    Route::post('/templates/{template}/clone', [TemplateController::class, 'clone'])->name('templates.clone');
+    Route::post('/templates/{template}/rate', [TemplateController::class, 'rate'])->name('templates.rate');
+    Route::post('/roadmaps/{roadmap}/create-template', [TemplateController::class, 'createFromRoadmap'])
+        ->name('templates.createFromRoadmap');
+
+    // Focus Session Routes
+    Route::get('/focus', [FocusSessionController::class, 'index'])->name('focus.index');
+    Route::post('/focus/start', [FocusSessionController::class, 'start'])->name('focus.start');
+    Route::post('/focus/{session}/end', [FocusSessionController::class, 'end'])->name('focus.end');
+    Route::get('/focus/status', [FocusSessionController::class, 'status'])->name('focus.status');
+    Route::get('/focus/history', [FocusSessionController::class, 'history'])->name('focus.history');
+    Route::get('/focus/heatmap', [FocusSessionController::class, 'heatmap'])->name('focus.heatmap');
+
+    // Bookmark Routes
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    Route::post('/bookmarks/topics/{topic}', [BookmarkController::class, 'toggleTopic'])->name('bookmarks.topic');
+    Route::post('/bookmarks/resources/{resource}', [BookmarkController::class, 'toggleResource'])->name('bookmarks.resource');
+    Route::post('/bookmarks/roadmaps/{roadmap}', [BookmarkController::class, 'toggleRoadmap'])->name('bookmarks.roadmap');
+    Route::patch('/bookmarks/{bookmark}', [BookmarkController::class, 'update'])->name('bookmarks.update');
+    Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
+
+    // Daily Challenges & Weekly Goals Routes
+    Route::get('/challenges', [ChallengeController::class, 'index'])->name('challenges.index');
+    Route::get('/challenges/daily', [ChallengeController::class, 'getChallenges'])->name('challenges.daily');
+    Route::get('/challenges/weekly', [ChallengeController::class, 'getGoals'])->name('challenges.weekly');
+    Route::post('/challenges/refresh', [ChallengeController::class, 'refreshChallenges'])->name('challenges.refresh');
+
+    // Spaced Repetition Review Routes
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('/reviews/{review}/record', [ReviewController::class, 'record'])->name('reviews.record');
+    Route::post('/reviews/topics/{topic}', [ReviewController::class, 'addTopic'])->name('reviews.addTopic');
+    Route::post('/reviews/resources/{resource}', [ReviewController::class, 'addResource'])->name('reviews.addResource');
+    Route::post('/reviews/{review}/suspend', [ReviewController::class, 'suspend'])->name('reviews.suspend');
+    Route::post('/reviews/{review}/resume', [ReviewController::class, 'resume'])->name('reviews.resume');
+    Route::post('/reviews/{review}/reset', [ReviewController::class, 'reset'])->name('reviews.reset');
+
+    // Roadmap Forking
+    Route::post('/roadmaps/{roadmap}/fork', [RoadmapController::class, 'fork'])->name('roadmaps.fork');
 });
 
 // Public Certificate Verification Route

@@ -1,10 +1,10 @@
-<x-app-layout>
+<x-layouts.app-with-sidebar>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">
                 {{ __('Dashboard') }}
             </h2>
-            <div class="text-sm text-gray-600">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
                 <span class="font-medium">Welcome back!</span> {{ auth()->user()->name }}
             </div>
         </div>
@@ -123,6 +123,83 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Gamification Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 animate-slide-in">
+                <!-- Streak Card -->
+                <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white shadow-xl hover-lift">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold">🔥 Current Streak</h3>
+                        <span class="text-4xl font-black">{{ $gamification['streak'] }}</span>
+                    </div>
+                    <p class="text-orange-100 text-sm">{{ $gamification['streak'] === 1 ? 'day' : 'days' }} in a row!</p>
+                    @if($gamification['streak'] >= 7)
+                        <div class="mt-3 pt-3 border-t border-orange-400">
+                            <p class="text-xs text-orange-100">🎉 Keep it up! You're on fire!</p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Level Card -->
+                <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl hover-lift">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold">{{ $gamification['level']['badge']['icon'] }} Level {{ $gamification['level']['level'] }}</h3>
+                            <p class="text-purple-100 text-sm">{{ $gamification['level']['badge']['name'] }}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-black">{{ $gamification['level']['xp'] }}</div>
+                            <div class="text-xs text-purple-100">XP</div>
+                        </div>
+                    </div>
+                    <div class="w-full bg-white/20 rounded-full h-2">
+                        <div class="bg-white rounded-full h-2 transition-all duration-1000" style="width: {{ $gamification['level']['percentage'] }}%"></div>
+                    </div>
+                    <p class="text-xs text-purple-100 mt-2">{{ $gamification['level']['needed_xp'] }} XP to next level</p>
+                </div>
+
+                <!-- Achievements Card -->
+                <div class="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl hover-lift">
+                    <h3 class="text-lg font-bold mb-3">🏆 Achievements</h3>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($gamification['achievements'] as $achievement)
+                            <div class="relative group">
+                                <span class="text-2xl {{ $achievement['unlocked'] ? 'opacity-100' : 'opacity-30 grayscale' }}"
+                                      title="{{ $achievement['title'] }}">
+                                    {{ $achievement['icon'] }}
+                                </span>
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+                                    {{ $achievement['title'] }}
+                                    <div class="text-xs opacity-75">{{ $achievement['progress'] }}/{{ $achievement['total'] }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-orange-400">
+                        <p class="text-xs text-orange-100">
+                            {{ collect($gamification['achievements'])->where('unlocked', true)->count() }}/{{ count($gamification['achievements']) }} unlocked
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-slide-in">
+                <!-- Progress Timeline -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 hover-lift">
+                    <canvas id="progressChart" height="200"></canvas>
+                </div>
+
+                <!-- Time Distribution -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 hover-lift">
+                    <canvas id="timeChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Completion Funnel -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 mb-8 animate-slide-in hover-lift">
+                <canvas id="funnelChart" height="100"></canvas>
             </div>
 
             <!-- Recent Roadmaps and Activities -->
@@ -345,4 +422,9 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+
+    <!-- Pass chart data to JavaScript -->
+    <script>
+        window.chartData = @json($chartData);
+    </script>
+</x-layouts.app-with-sidebar>

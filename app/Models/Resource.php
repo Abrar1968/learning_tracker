@@ -25,6 +25,14 @@ class Resource extends Model
         'estimated_duration',
         'is_completed',
         'completed_at',
+        // New fields
+        'rating',
+        'difficulty',
+        'actual_duration',
+        'author',
+        'source',
+        'priority',
+        'notes',
     ];
 
     protected function casts(): array
@@ -32,8 +40,34 @@ class Resource extends Model
         return [
             'is_completed' => 'boolean',
             'completed_at' => 'datetime',
+            'rating' => 'decimal:1',
         ];
     }
+
+    /**
+     * Resource types (enhanced)
+     */
+    public const TYPES = [
+        'video' => ['name' => 'Video', 'icon' => '🎥'],
+        'article' => ['name' => 'Article', 'icon' => '📄'],
+        'book' => ['name' => 'Book', 'icon' => '📚'],
+        'course' => ['name' => 'Course', 'icon' => '🎓'],
+        'documentation' => ['name' => 'Documentation', 'icon' => '📋'],
+        'podcast' => ['name' => 'Podcast', 'icon' => '🎧'],
+        'github' => ['name' => 'GitHub Repo', 'icon' => '💻'],
+        'tutorial' => ['name' => 'Tutorial', 'icon' => '📝'],
+        'tool' => ['name' => 'Tool', 'icon' => '🔧'],
+        'other' => ['name' => 'Other', 'icon' => '📎'],
+    ];
+
+    /**
+     * Difficulty levels
+     */
+    public const DIFFICULTIES = [
+        'beginner' => 'Beginner',
+        'intermediate' => 'Intermediate',
+        'advanced' => 'Advanced',
+    ];
 
     // Relationships
     public function topic(): BelongsTo
@@ -54,6 +88,26 @@ class Resource extends Model
     public function activityLogs(): MorphMany
     {
         return $this->morphMany(ActivityLog::class, 'loggable');
+    }
+
+    public function bookmarks(): MorphMany
+    {
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function reviewSchedules(): HasMany
+    {
+        return $this->hasMany(ReviewSchedule::class);
+    }
+
+    public function focusSessions(): HasMany
+    {
+        return $this->hasMany(FocusSession::class);
     }
 
     // Scopes
@@ -92,5 +146,37 @@ class Resource extends Model
             'is_completed' => true,
             'completed_at' => now(),
         ]);
+    }
+
+    /**
+     * Get type icon
+     */
+    public function getTypeIconAttribute(): string
+    {
+        return self::TYPES[$this->type]['icon'] ?? '📎';
+    }
+
+    /**
+     * Get type name
+     */
+    public function getTypeNameAttribute(): string
+    {
+        return self::TYPES[$this->type]['name'] ?? 'Other';
+    }
+
+    /**
+     * Scope by difficulty
+     */
+    public function scopeByDifficulty($query, string $difficulty)
+    {
+        return $query->where('difficulty', $difficulty);
+    }
+
+    /**
+     * Scope by priority
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderByDesc('priority')->orderBy('created_at');
     }
 }

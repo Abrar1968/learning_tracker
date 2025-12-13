@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layouts.app-with-sidebar>
     <x-slot name="header">
         <div>
             <h2 class="font-black text-3xl text-gray-900 leading-tight">
@@ -15,7 +15,7 @@
                     <h3 class="text-2xl font-black">Update Topic</h3>
                     <p class="text-indigo-100 text-sm mt-1">Modify the topic details below</p>
                 </div>
-                <form action="{{ route('topics.update', $topic) }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+                <form action="{{ route('roadmaps.topics.update', [$topic->roadmap, $topic]) }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
                     @csrf
                     @method('PUT')
 
@@ -59,26 +59,52 @@
                         @enderror
                     </div>
 
-                    <!-- Status -->
-                    <div>
-                        <label for="status" class="block text-sm font-bold text-gray-900 mb-2">
-                            <span class="flex items-center">
-                                <svg class="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Status
-                            </span>
-                        </label>
-                        <select name="status"
-                                id="status"
-                                class="mt-1 block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 px-4 py-3 transition-all">
-                            <option value="not_started" {{ old('status', $topic->status) === 'not_started' ? 'selected' : '' }}>Not Started</option>
-                            <option value="in_progress" {{ old('status', $topic->status) === 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                            <option value="completed" {{ old('status', $topic->status) === 'completed' ? 'selected' : '' }}>Completed</option>
-                        </select>
-                        @error('status')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <!-- Parent Topic & Status -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="parent_id" class="block text-sm font-bold text-gray-900 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                    </svg>
+                                    Parent Topic
+                                </span>
+                            </label>
+                            <select name="parent_id"
+                                    id="parent_id"
+                                    class="mt-1 block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500 px-4 py-3 transition-all">
+                                <option value="">None (Root Topic)</option>
+                                @foreach($parentTopics as $parentTopic)
+                                    <option value="{{ $parentTopic->id }}" {{ old('parent_id', $topic->parent_id) == $parentTopic->id ? 'selected' : '' }}>
+                                        {{ $parentTopic->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('parent_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="status" class="block text-sm font-bold text-gray-900 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Status
+                                </span>
+                            </label>
+                            <select name="status"
+                                    id="status"
+                                    class="mt-1 block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 px-4 py-3 transition-all">
+                                <option value="not_started" {{ old('status', $topic->status) === 'not_started' ? 'selected' : '' }}>Not Started</option>
+                                <option value="in_progress" {{ old('status', $topic->status) === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                <option value="completed" {{ old('status', $topic->status) === 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
+                            @error('status')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- Estimated Hours & Actual Hours -->
@@ -223,4 +249,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app-with-sidebar>

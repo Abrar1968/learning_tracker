@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layouts.app-with-sidebar>
     <x-slot name="header">
         <div>
             <h2 class="font-black text-3xl text-gray-900 leading-tight">
@@ -134,4 +134,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app-with-sidebar>

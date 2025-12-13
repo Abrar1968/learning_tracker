@@ -114,7 +114,7 @@ class TopicController extends Controller
         }
 
         return redirect()
-            ->route('topics.show', [$roadmap, $topic])
+            ->route('topics.show', $topic)
             ->with('success', 'Topic updated successfully!');
     }
 
@@ -135,5 +135,27 @@ class TopicController extends Controller
         return redirect()
             ->route('roadmaps.show', $roadmap)
             ->with('success', 'Topic deleted successfully!');
+    }
+
+    /**
+     * Reorder topics
+     */
+    public function reorder(Request $request, Roadmap $roadmap)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer|exists:topics,id'
+        ]);
+
+        foreach ($request->order as $index => $topicId) {
+            $roadmap->topics()->where('id', $topicId)->update(['order' => $index + 1]);
+        }
+
+        activity()
+            ->performedOn($roadmap)
+            ->withProperties(['topics_reordered' => count($request->order)])
+            ->log('topics_reordered');
+
+        return response()->json(['success' => true]);
     }
 }

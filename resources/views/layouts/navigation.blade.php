@@ -40,8 +40,91 @@
                             Certificates
                         </span>
                     </a>
+
+                    <!-- More Dropdown -->
+                    <div x-data="{ moreOpen: false }" class="relative">
+                        <button @click="moreOpen = !moreOpen"
+                                class="px-4 py-2 text-white/90 hover:text-white font-semibold rounded-lg hover:bg-white/20 backdrop-blur-sm transition-all duration-200 flex items-center {{ request()->routeIs('focus.*', 'templates.*', 'bookmarks.*', 'challenges.*', 'reviews.*') ? 'bg-white/25 text-white' : '' }}">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                            More
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="moreOpen"
+                             @click.away="moreOpen = false"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-56 rounded-xl bg-white dark:bg-dark-800 shadow-xl ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-dark-700 z-50">
+                            <div class="py-2">
+                                <a href="{{ route('focus.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-700 {{ request()->routeIs('focus.*') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    <svg class="w-5 h-5 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Focus Timer
+                                </a>
+                                <a href="{{ route('templates.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-700 {{ request()->routeIs('templates.*') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    <svg class="w-5 h-5 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+                                    </svg>
+                                    Templates
+                                </a>
+                                <a href="{{ route('bookmarks.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-700 {{ request()->routeIs('bookmarks.*') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    <svg class="w-5 h-5 mr-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                                    </svg>
+                                    Bookmarks
+                                </a>
+                            </div>
+                            <div class="py-2">
+                                <a href="{{ route('challenges.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-700 {{ request()->routeIs('challenges.*') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    <svg class="w-5 h-5 mr-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                    </svg>
+                                    Challenges
+                                </a>
+                                <a href="{{ route('reviews.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-700 {{ request()->routeIs('reviews.*') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    <svg class="w-5 h-5 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                    </svg>
+                                    Spaced Repetition
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Search Button -->
+            <div class="hidden sm:flex sm:items-center sm:ml-4">
+                <button @click="$root.querySelector('[x-data]').dispatchEvent(new CustomEvent('open-global-search'))"
+                        class="px-4 py-2 text-white/90 hover:text-white font-semibold rounded-lg hover:bg-white/20 backdrop-blur-sm transition-all duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <span class="hidden md:inline">Search</span>
+                    <kbd class="hidden lg:inline ml-2 px-2 py-1 text-xs bg-white/20 rounded">⌘K</kbd>
+                </button>
+            </div>
+
+            <!-- Dark Mode Toggle -->
+            <x-dark-mode-toggle class="hidden sm:flex sm:items-center" />
+
+            <!-- Keyboard Shortcuts Button -->
+            <button @click="$dispatch('show-keyboard-help')"
+                    class="hidden sm:flex p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200"
+                    title="Keyboard shortcuts (?)">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+            </button>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -116,6 +199,24 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('certificates.index')" :active="request()->routeIs('certificates.*')">
                 {{ __('Certificates') }}
+            </x-responsive-nav-link>
+
+            <!-- Additional Features -->
+            <div class="border-t border-slate-100 my-2"></div>
+            <x-responsive-nav-link :href="route('focus.index')" :active="request()->routeIs('focus.*')">
+                {{ __('Focus Timer') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('templates.index')" :active="request()->routeIs('templates.*')">
+                {{ __('Templates') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('bookmarks.index')" :active="request()->routeIs('bookmarks.*')">
+                {{ __('Bookmarks') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('challenges.index')" :active="request()->routeIs('challenges.*')">
+                {{ __('Challenges') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('reviews.index')" :active="request()->routeIs('reviews.*')">
+                {{ __('Spaced Repetition') }}
             </x-responsive-nav-link>
         </div>
 

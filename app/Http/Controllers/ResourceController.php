@@ -141,4 +141,18 @@ class ResourceController extends Controller
             ->route('topics.show', $topic)
             ->with('success', 'Resource deleted successfully!');
     }
+
+    /**
+     * Mark a resource as completed.
+     */
+    public function complete(Resource $resource)
+    {
+        Gate::authorize('update', $resource);
+
+        $this->resourceService->markAsCompleted($resource);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Resource marked as completed!');
+    }
 }

@@ -2,42 +2,113 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GamificationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        $user = auth()->user();
+    public function __construct(
+        protected GamificationService $gamificationService
+    ) {}
 
-        // Calculate statistics
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        // Optimized stats
         $stats = [
             'total_roadmaps' => $user->roadmaps()->count(),
             'active_roadmaps' => $user->roadmaps()->where('status', 'in_progress')->count(),
             'completed_roadmaps' => $user->roadmaps()->where('status', 'completed')->count(),
             'certificates_earned' => $user->certificates()->count(),
-            'time_spent_hours' => $user->topicProgress()
-                ->sum(DB::raw('COALESCE(time_spent, 0)')) / 60,
+            'time_spent_hours' => round($user->topicProgress()->sum('time_spent') / 60, 1),
         ];
 
-        // Format time spent to show as integer
-        $stats['time_spent_hours'] = (int) round($stats['time_spent_hours']);
-
-        // Get recent roadmaps with topic counts and progress
+        // Recent data with eager loading
         $recentRoadmaps = $user->roadmaps()
-            ->withCount('topics')
+            ->with(['topics', 'certificate'])
             ->latest()
-            ->limit(5)
+            ->take(5)
             ->get();
 
-        // Get recent activities
         $recentActivities = $user->activityLogs()
             ->with('loggable')
             ->latest()
-            ->limit(10)
+            ->take(10)
             ->get();
 
-        return view('dashboard', compact('stats', 'recentRoadmaps', 'recentActivities'));
+        // Gamification data
+        $gamification = [
+            'streak' => $this->gamificationService->calculateStreak($user),
+            'achievements' => $this->gamificationService->getAchievements($user),
+            'level' => $this->gamificationService->calculateLevel($user),
+        ];
+
+        // Chart data
+        $chartData = [
+            'progressTimeline' => $this->getProgressTimeline($user),
+            'activityHeatmap' => $this->getActivityHeatmap($user),
+            'timeDistribution' => $this->getTimeDistribution($user),
+            'completionFunnel' => $this->getCompletionFunnel($user),
+        ];
+
+        return view('dashboard', compact(
+            'stats',
+            'recentRoadmaps',
+            'recentActivities',
+            'gamification',
+            'chartData'
+        ));
+    }
+
+    private function getProgressTimeline($user)
+    {
+        return $user->activityLogs()
+            ->where('action', 'topic_completed')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
+    }
+
+    private function getActivityHeatmap($user)
+    {
+        return $user->activityLogs()
+            ->where('created_at', '>=', now()->subYear())
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
+    }
+
+    private function getTimeDistribution($user)
+    {
+        return $user->roadmaps()
+            ->with('topics.progress')
+            ->get()
+            ->mapWithKeys(function ($roadmap) use ($user) {
+                $time = $roadmap->topics->sum(function ($topic) use ($user) {
+                    return $user->topicProgress()
+                        ->where('topic_id', $topic->id)
+                        ->sum('time_spent') ?? 0;
+                });
+                return [$roadmap->title => round($time / 60, 1)];
+            })
+            ->filter(fn($time) => $time > 0)
+            ->toArray();
+    }
+
+    private function getCompletionFunnel($user)
+    {
+        $total = $user->roadmaps()->withCount('topics')->get()->sum('topics_count');
+        $started = $user->topicProgress()->whereNotNull('started_at')->count();
+        $completed = $user->topicProgress()->whereNotNull('completed_at')->count();
+
+        return [
+            'labels' => ['Total Topics', 'Started', 'Completed'],
+            'data' => [$total, $started, $completed],
+        ];
     }
 }

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layouts.app-with-sidebar>
     <x-slot name="header">
         <div>
             <h2 class="font-black text-3xl text-gray-900 leading-tight">
@@ -15,7 +15,7 @@
                     <h3 class="text-2xl font-black">Topic Details</h3>
                     <p class="text-indigo-100 text-sm mt-1">Add a new learning module to your roadmap</p>
                 </div>
-                <form action="{{ route('topics.store') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+                <form action="{{ route('roadmaps.topics.store', $roadmap) }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
                     @csrf
                     <input type="hidden" name="roadmap_id" value="{{ $roadmap->id }}">
 
@@ -77,7 +77,7 @@
                                     class="mt-1 block w-full rounded-xl border-2 border-gray-200 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500 px-4 py-3 transition-all">
                                 <option value="">None (Root Topic)</option>
                                 @foreach($roadmap->topics()->whereNull('parent_id')->get() as $topic)
-                                    <option value="{{ $topic->id }}" {{ old('parent_id') == $topic->id ? 'selected' : '' }}>
+                                    <option value="{{ $topic->id }}" {{ old('parent_id', request('parent_id')) == $topic->id ? 'selected' : '' }}>
                                         {{ $topic->title }}
                                     </option>
                                 @endforeach
@@ -188,4 +188,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-layouts.app-with-sidebar>

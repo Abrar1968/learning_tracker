@@ -118,6 +118,18 @@ class RoadmapService
             'completed_topics' => $completedTopics,
         ]);
 
+        // Check for milestone achievement
+        $milestone = $this->checkMilestones($roadmap);
+
+        if ($milestone) {
+            session()->flash('milestone', $milestone);
+        }
+
+        // Auto-complete roadmap if all topics done
+        if ($completedTopics > 0 && $completedTopics === $totalTopics && $roadmap->status !== 'completed') {
+            $this->completeRoadmap($roadmap);
+        }
+
         return [
             'total_topics' => $totalTopics,
             'completed_topics' => $completedTopics,
@@ -125,5 +137,35 @@ class RoadmapService
             'not_started_topics' => $totalTopics - $completedTopics - $inProgressTopics,
             'progress_percentage' => round($progressPercentage, 2),
         ];
+    }
+
+    public function checkMilestones(Roadmap $roadmap): ?int
+    {
+        $progress = round($roadmap->progress_percentage);
+        $milestones = [25, 50, 75, 100];
+
+        // Get achieved milestones from metadata
+        $metadata = is_array($roadmap->metadata) ? $roadmap->metadata : [];
+        $achieved = $metadata['milestones_achieved'] ?? [];
+
+        foreach ($milestones as $milestone) {
+            if ($progress >= $milestone && !in_array($milestone, $achieved)) {
+                // Mark as achieved
+                $achieved[] = $milestone;
+                $roadmap->update([
+                    'metadata' => array_merge($metadata, ['milestones_achieved' => $achieved])
+                ]);
+
+                // Log activity
+                activity()
+                    ->performedOn($roadmap)
+                    ->withProperties(['milestone' => $milestone, 'progress' => $progress])
+                    ->log('milestone_achieved');
+
+                return $milestone;
+            }
+        }
+
+        return null;
     }
 }
