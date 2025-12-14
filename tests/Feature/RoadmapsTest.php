@@ -157,7 +157,7 @@ describe('Roadmap Delete', function () {
             ->delete(route('roadmaps.destroy', $roadmap))
             ->assertRedirect();
 
-        $this->assertDatabaseMissing('roadmaps', ['id' => $roadmap->id]);
+        $this->assertSoftDeleted('roadmaps', ['id' => $roadmap->id]);
     });
 
     it('prevents deleting other users roadmaps', function () {

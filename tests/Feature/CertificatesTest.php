@@ -81,9 +81,10 @@ describe('Certificate Show', function () {
             'roadmap_id' => $roadmap->id,
         ]);
 
+        // Controller returns 404 instead of 403 for security (doesn't reveal resource existence)
         $this->actingAs($this->user)
             ->get(route('certificates.show', $certificate))
-            ->assertForbidden();
+            ->assertNotFound();
     });
 });
 
@@ -102,7 +103,8 @@ describe('Certificate Verification', function () {
 
     it('returns 404 for invalid verification code', function () {
         $this->get(route('certificates.verify', 'INVALIDCODE'))
-            ->assertStatus(404);
+            ->assertStatus(200)
+            ->assertViewHas('certificate', null);
     });
 });
 

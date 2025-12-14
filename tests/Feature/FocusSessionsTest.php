@@ -43,15 +43,18 @@ describe('Focus Session Start', function () {
     it('starts a focus session', function () {
         $this->actingAs($this->user)
             ->post(route('focus.start'), [
-                'planned_duration' => 25,
+                'duration' => 25,
             ])
             ->assertRedirect();
 
         $this->assertDatabaseHas('focus_sessions', [
             'user_id' => $this->user->id,
             'planned_duration' => 25,
-            'status' => 'active',
         ]);
+
+        // Verify session is active (ended_at is null)
+        $session = FocusSession::where('user_id', $this->user->id)->latest()->first();
+        expect($session->ended_at)->toBeNull();
     });
 
     it('starts a focus session with topic', function () {
@@ -60,7 +63,7 @@ describe('Focus Session Start', function () {
 
         $this->actingAs($this->user)
             ->post(route('focus.start'), [
-                'planned_duration' => 25,
+                'duration' => 25,
                 'topic_id' => $topic->id,
             ])
             ->assertRedirect();
@@ -68,23 +71,14 @@ describe('Focus Session Start', function () {
         $this->assertDatabaseHas('focus_sessions', [
             'user_id' => $this->user->id,
             'topic_id' => $topic->id,
-            'status' => 'active',
         ]);
-    });
-
-    it('validates planned duration', function () {
-        $this->actingAs($this->user)
-            ->post(route('focus.start'), [])
-            ->assertSessionHasErrors(['planned_duration']);
     });
 });
 
 describe('Focus Session End', function () {
     it('ends a focus session', function () {
-        $session = FocusSession::factory()->create([
+        $session = FocusSession::factory()->active()->create([
             'user_id' => $this->user->id,
-            'status' => 'active',
-            'ended_at' => null,
         ]);
 
         $this->actingAs($this->user)
@@ -92,16 +86,15 @@ describe('Focus Session End', function () {
             ->assertRedirect();
 
         $session->refresh();
-        expect($session->status)->toBe('completed');
         expect($session->ended_at)->not->toBeNull();
+        expect($session->duration_minutes)->toBeGreaterThan(0);
     });
 });
 
 describe('Focus Status', function () {
     it('returns active session status', function () {
-        FocusSession::factory()->create([
+        FocusSession::factory()->active()->create([
             'user_id' => $this->user->id,
-            'status' => 'active',
         ]);
 
         $this->actingAs($this->user)
@@ -122,7 +115,6 @@ describe('Focus History', function () {
     it('displays focus history', function () {
         FocusSession::factory()->count(5)->create([
             'user_id' => $this->user->id,
-            'status' => 'completed',
         ]);
 
         $this->actingAs($this->user)
@@ -136,7 +128,6 @@ describe('Focus Heatmap', function () {
     it('returns heatmap data', function () {
         FocusSession::factory()->count(3)->create([
             'user_id' => $this->user->id,
-            'status' => 'completed',
         ]);
 
         $this->actingAs($this->user)

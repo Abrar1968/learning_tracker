@@ -47,8 +47,7 @@ describe('Reviews Index', function () {
 
         ReviewSchedule::factory()->create([
             'user_id' => $this->user->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
+            'topic_id' => $topic->id,
             'next_review_date' => now(),
             'is_active' => true,
         ]);
@@ -70,8 +69,7 @@ describe('Add to Review', function () {
 
         $this->assertDatabaseHas('review_schedules', [
             'user_id' => $this->user->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
+            'topic_id' => $topic->id,
         ]);
     });
 });
@@ -82,8 +80,7 @@ describe('Review Show', function () {
         $topic = Topic::factory()->create(['roadmap_id' => $roadmap->id]);
         $review = ReviewSchedule::factory()->create([
             'user_id' => $this->user->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
+            'topic_id' => $topic->id,
         ]);
 
         $this->actingAs($this->user)
@@ -98,8 +95,7 @@ describe('Review Show', function () {
         $topic = Topic::factory()->create(['roadmap_id' => $roadmap->id]);
         $review = ReviewSchedule::factory()->create([
             'user_id' => $otherUser->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
+            'topic_id' => $topic->id,
         ]);
 
         $this->actingAs($this->user)
@@ -114,9 +110,8 @@ describe('Record Review', function () {
         $topic = Topic::factory()->create(['roadmap_id' => $roadmap->id]);
         $review = ReviewSchedule::factory()->create([
             'user_id' => $this->user->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
-            'review_count' => 0,
+            'topic_id' => $topic->id,
+            'repetition_count' => 0,
         ]);
 
         $this->actingAs($this->user)
@@ -126,8 +121,8 @@ describe('Record Review', function () {
             ->assertRedirect();
 
         $review->refresh();
-        expect($review->review_count)->toBe(1);
-        expect($review->last_reviewed_at)->not->toBeNull();
+        expect($review->repetition_count)->toBe(1);
+        expect($review->last_review_date)->not->toBeNull();
     });
 });
 
@@ -137,8 +132,7 @@ describe('Suspend Review', function () {
         $topic = Topic::factory()->create(['roadmap_id' => $roadmap->id]);
         $review = ReviewSchedule::factory()->create([
             'user_id' => $this->user->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
+            'topic_id' => $topic->id,
             'is_active' => true,
         ]);
 
@@ -157,8 +151,7 @@ describe('Resume Review', function () {
         $topic = Topic::factory()->create(['roadmap_id' => $roadmap->id]);
         $review = ReviewSchedule::factory()->create([
             'user_id' => $this->user->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
+            'topic_id' => $topic->id,
             'is_active' => false,
         ]);
 
@@ -177,9 +170,8 @@ describe('Reset Review', function () {
         $topic = Topic::factory()->create(['roadmap_id' => $roadmap->id]);
         $review = ReviewSchedule::factory()->create([
             'user_id' => $this->user->id,
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => $topic->id,
-            'review_count' => 5,
+            'topic_id' => $topic->id,
+            'repetition_count' => 5,
             'interval_days' => 30,
         ]);
 
@@ -188,7 +180,7 @@ describe('Reset Review', function () {
             ->assertRedirect();
 
         $review->refresh();
-        expect($review->review_count)->toBe(0);
+        expect($review->repetition_count)->toBe(0);
         expect($review->interval_days)->toBe(1);
     });
 });

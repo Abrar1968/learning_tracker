@@ -22,13 +22,14 @@ class ReviewScheduleFactory extends Factory
 
         return [
             'user_id' => User::factory(),
-            'reviewable_type' => 'App\\Models\\Topic',
-            'reviewable_id' => Topic::factory(),
+            'topic_id' => Topic::factory(),
+            'resource_id' => null,
             'next_review_date' => fake()->dateTimeBetween('now', '+30 days'),
-            'last_reviewed_at' => fake()->optional()->dateTimeBetween('-30 days', 'now'),
-            'review_count' => fake()->numberBetween(0, 10),
+            'last_review_date' => fake()->optional()->dateTimeBetween('-30 days', 'now'),
+            'repetition_count' => fake()->numberBetween(0, 10),
             'interval_days' => fake()->randomElement($intervals),
-            'ease_factor' => fake()->randomFloat(2, 1.3, 2.5),
+            'easiness_factor' => fake()->randomFloat(2, 1.3, 2.5),
+            'quality_score' => fake()->optional()->numberBetween(0, 5),
             'is_active' => true,
         ];
     }

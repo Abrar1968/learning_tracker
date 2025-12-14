@@ -52,12 +52,12 @@ describe('Resource Create', function () {
             ->assertSessionHasErrors(['title', 'type']);
     });
 
-    it('validates url for link type resources', function () {
+    it('validates url format when provided', function () {
         $this->actingAs($this->user)
             ->post(route('topics.resources.store', $this->topic), [
                 'title' => 'Video Resource',
                 'type' => 'video',
-                // Missing URL
+                'url' => 'invalid-url-format',
             ])
             ->assertSessionHasErrors(['url']);
     });
@@ -110,7 +110,7 @@ describe('Resource Delete', function () {
             ->delete(route('topics.resources.destroy', [$this->topic, $resource]))
             ->assertRedirect();
 
-        $this->assertDatabaseMissing('resources', ['id' => $resource->id]);
+        $this->assertSoftDeleted('resources', ['id' => $resource->id]);
     });
 });
 

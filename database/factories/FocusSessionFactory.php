@@ -27,8 +27,9 @@ class FocusSessionFactory extends Factory
             'started_at' => $startedAt,
             'ended_at' => (clone $startedAt)->modify("+{$duration} minutes"),
             'planned_duration' => $duration,
-            'actual_duration' => $duration,
-            'status' => 'completed',
+            'duration_minutes' => $duration,
+            'type' => 'pomodoro',
+            'was_interrupted' => false,
             'notes' => fake()->optional()->sentence(),
         ];
     }
@@ -37,15 +38,22 @@ class FocusSessionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'ended_at' => null,
-            'actual_duration' => null,
-            'status' => 'active',
+            'duration_minutes' => null,
         ]);
     }
 
-    public function paused(): static
+    public function interrupted(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'paused',
+            'was_interrupted' => true,
+        ]);
+    }
+
+    public function deepWork(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'deep_work',
+            'planned_duration' => 60,
         ]);
     }
 }
