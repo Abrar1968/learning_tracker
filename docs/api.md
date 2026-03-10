@@ -1,12 +1,12 @@
 # API Documentation
-## Learning Progress Tracker - RESTful API Reference
+## LearnForge — RESTful API Reference
 
-**Version:** 1.0  
-**Last Updated:** December 11, 2025  
-**Framework:** Laravel 12.x  
-**API Type:** RESTful API  
-**Base URL:** `/api/v1` (future API version) or direct routes  
-**Authentication:** Laravel Sanctum (Session-based for web)
+**Version:** 4.0 (Windows + VSCode Edition)
+**Last Updated:** March 2026
+**Framework:** Laravel 12.x
+**API Type:** RESTful API
+**Base URL:** `/api/v1/`
+**Authentication:** Laravel Sanctum (Session-based for web + Bearer token for external access)
 
 ---
 
@@ -24,6 +24,19 @@
 10. [Certificate Endpoints](#certificate-endpoints)
 11. [User Profile Endpoints](#user-profile-endpoints)
 12. [Search Endpoints](#search-endpoints)
+13. [AI Endpoints](#ai-endpoints)
+14. [SRS / Flashcard Endpoints](#srs--flashcard-endpoints)
+15. [Gamification Endpoints](#gamification-endpoints)
+16. [Social Endpoints](#social-endpoints)
+17. [Journal & Mood Endpoints](#journal--mood-endpoints)
+18. [Productivity Endpoints](#productivity-endpoints)
+19. [Analytics Endpoints](#analytics-endpoints)
+20. [Integration Endpoints](#integration-endpoints)
+21. [PWA & Push Endpoints](#pwa--push-endpoints)
+22. [Admin Endpoints](#admin-endpoints)
+23. [Public Endpoints](#public-endpoints)
+24. [Webhook Events Reference](#webhook-events-reference)
+25. [Rate Limiting](#rate-limiting)
 
 ---
 
@@ -32,10 +45,11 @@
 ### Base Information
 
 - **Protocol**: HTTPS (enforced in production)
-- **Authentication**: Session-based (CSRF token required)
+- **Authentication**: Session-based (CSRF token) for web; Bearer token for external API
 - **Content-Type**: `application/json`
-- **Rate Limiting**: 100 requests per minute per user
-- **Pagination**: 20 items per page (default)
+- **Rate Limiting**: 100 req/min (authenticated), 20 req/min (unauthenticated), 10 req/min (AI endpoints)
+- **Pagination**: 20 items per page (default), max 50
+- **API Documentation**: Auto-generated at `/api/docs` via Laravel Scribe
 
 ### HTTP Methods
 
@@ -48,16 +62,14 @@
 
 ## Authentication
 
-### CSRF Token
+### Session-Based (Web — CSRF Token)
 
 All POST, PUT, PATCH, DELETE requests require CSRF token:
 
 ```javascript
-// Get CSRF token from meta tag
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-// Include in request headers
-fetch('/api/roadmaps', {
+fetch('/api/v1/roadmaps', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -66,6 +78,17 @@ fetch('/api/roadmaps', {
     body: JSON.stringify(data)
 });
 ```
+
+### Bearer Token (External / Webhook / Automation)
+
+Personal API tokens via Laravel Sanctum — generated in **Profile → Developer → API Tokens**:
+
+```http
+Authorization: Bearer {your-api-token}
+Content-Type: application/json
+```
+
+Token scopes: `read`, `write`, `delete` (selected on creation).
 
 ---
 
@@ -529,7 +552,7 @@ fetch('/api/roadmaps', {
 }
 ```
 
-**Status Values**: `not_started`, `in_progress`, `completed`, `skipped`
+**Status Values**: `not_started`, `in_progress`, `completed`, `skipped`, `on_hold`
 
 **Response** (200):
 ```json
@@ -817,7 +840,7 @@ tags[]: javascript, guide
 }
 ```
 
-**Template Types**: `modern`, `classic`, `minimal`
+**Template Types**: `modern`, `classic`, `minimalist`, `dark`, `neon`
 
 **Response** (201):
 ```json
@@ -826,13 +849,15 @@ tags[]: javascript, guide
     "data": {
         "id": 1,
         "uuid": "550e8400-e29b-41d4-a716-446655440000",
-        "certificate_number": "CERT-ABC1234567",
-        "issued_at": "2025-12-11T10:00:00Z",
+        "certificate_number": "LF-2026-A1B2C3D4",
+        "composite_score": 87.50,
+        "issued_at": "2026-03-09T10:00:00Z",
         "verification_url": "https://app.com/verify/550e8400-e29b-41d4-a716-446655440000",
-        "download_url": "https://app.com/certificates/550e8400-e29b-41d4-a716-446655440000/download"
+        "download_url": "https://app.com/certificates/550e8400-e29b-41d4-a716-446655440000/download",
+        "share_image_url": "https://app.com/certificates/550e8400-e29b-41d4-a716-446655440000/og-image.png",
+        "qr_code_url": "https://app.com/certificates/550e8400-e29b-41d4-a716-446655440000/qr"
     },
     "message": "Certificate generated successfully"
-}
 ```
 
 ### List User Certificates
@@ -866,20 +891,23 @@ tags[]: javascript, guide
 
 ### Verify Certificate (Public)
 
-**GET** `/verify/{uuid}`
+**GET** `/api/public/verify/{uuid}`
 
 **Response** (200):
 ```json
 {
     "success": true,
     "data": {
-        "certificate_number": "CERT-ABC1234567",
+        "certificate_number": "LF-2026-A1B2C3D4",
         "issued_to": "John Doe",
         "roadmap_title": "Full Stack Developer Roadmap",
-        "issued_at": "2025-12-11T10:00:00Z",
+        "issued_at": "2026-03-09T10:00:00Z",
         "total_topics": 20,
         "total_learning_hours": 200,
-        "is_valid": true
+        "composite_score": 87.50,
+        "sha256_hash": "a3b4c5d6...",
+        "is_valid": true,
+        "is_revoked": false
     }
 }
 ```
@@ -956,14 +984,14 @@ tags[]: javascript, guide
 
 ## Search Endpoints
 
-### Global Search
+### Global Search (TNTSearch / Laravel Scout)
 
-**GET** `/search`
+**GET** `/api/v1/search`
 
 **Query Parameters**:
 - `q` (string, required): Search query
-- `type` (string): Filter by type (roadmaps|topics|resources)
-- `limit` (integer): Max results (default: 20)
+- `type` (string): Filter — `roadmaps|topics|resources|users|journal`
+- `limit` (integer): Max results (default: 20, max: 50)
 
 **Response** (200):
 ```json
@@ -971,26 +999,16 @@ tags[]: javascript, guide
     "success": true,
     "data": {
         "roadmaps": [
-            {
-                "id": 1,
-                "title": "Full Stack Developer Roadmap",
-                "type": "roadmap"
-            }
+            { "id": 1, "title": "Full Stack Developer Roadmap", "type": "roadmap" }
         ],
         "topics": [
-            {
-                "id": 5,
-                "title": "JavaScript Fundamentals",
-                "roadmap_title": "Full Stack Developer Roadmap",
-                "type": "topic"
-            }
+            { "id": 5, "title": "JavaScript Fundamentals", "roadmap_title": "Full Stack Roadmap", "type": "topic" }
         ],
         "resources": [
-            {
-                "id": 12,
-                "title": "JavaScript Guide",
-                "type": "resource"
-            }
+            { "id": 12, "title": "JavaScript Guide", "type": "resource" }
+        ],
+        "users": [
+            { "username": "johndoe", "full_name": "John Doe", "type": "user" }
         ]
     }
 }
@@ -998,16 +1016,294 @@ tags[]: javascript, guide
 
 ---
 
+---
+
+## AI Endpoints
+
+> Rate limit: **10 requests/minute** per user. All AI calls are asynchronous (dispatched to queue); real-time progress via Pusher channel `ai.{session_id}`.
+
+```
+POST  /api/v1/ai/generate-roadmap          Generate roadmap from goal/JD/URL
+POST  /api/v1/ai/generate-flashcards/{id}  Generate flashcards for a topic (topicId)
+POST  /api/v1/ai/suggest-resources/{id}    AI resource suggestions for a topic
+POST  /api/v1/ai/chat                       AI coach message (streaming)
+GET   /api/v1/ai/schedule                  AI-generated weekly schedule
+```
+
+**POST /api/v1/ai/generate-roadmap** Request:
+```json
+{
+    "prompt": "I want to learn machine learning to get a job at a tech startup",
+    "style": "job_description",
+    "weeks_available": 12,
+    "hours_per_week": 10
+}
+```
+
+**Response** (202 Accepted — job queued):
+```json
+{
+    "success": true,
+    "message": "Generating your roadmap… this takes 15–30 seconds.",
+    "data": { "session_id": "abc123" }
+}
+```
+
+---
+
+## SRS / Flashcard Endpoints
+
+```
+GET    /api/v1/decks                        List user's flashcard decks
+POST   /api/v1/decks                        Create deck
+GET    /api/v1/decks/{id}                   Deck details
+DELETE /api/v1/decks/{id}                   Delete deck
+GET    /api/v1/decks/{id}/cards             List cards in deck
+POST   /api/v1/decks/{id}/cards             Add card
+PUT    /api/v1/cards/{id}                   Update card (front/back/tags)
+DELETE /api/v1/cards/{id}                   Delete card
+POST   /api/v1/decks/{id}/review            Submit review (rating 1–4 via SM-2)
+GET    /api/v1/review/due                   All cards due today (across all decks)
+GET    /api/v1/review/stats                 Retention stats, ease distribution
+```
+
+**POST /api/v1/decks/{id}/review** Request:
+```json
+{
+    "card_id": 42,
+    "rating": 3,
+    "response_time_ms": 4200
+}
+```
+
+**Response** (200):
+```json
+{
+    "success": true,
+    "data": {
+        "new_interval_days": 6,
+        "next_review_at": "2026-03-15",
+        "ease_factor": 2.50
+    }
+}
+```
+
+---
+
+## Gamification Endpoints
+
+```
+GET   /api/v1/xp/history                    XP transaction history (paginated)
+GET   /api/v1/achievements                  All achievements with earned status
+GET   /api/v1/badges                        All badges with earned status
+GET   /api/v1/leaderboard?period=week       Leaderboard (week|month|all_time)
+GET   /api/v1/challenges/today              Today's daily challenges
+POST  /api/v1/challenges/{id}/complete      Mark challenge complete
+GET   /api/v1/streak                        Current streak + freeze tokens
+```
+
+**GET /api/v1/leaderboard?period=week** Response:
+```json
+{
+    "success": true,
+    "data": {
+        "period": "week",
+        "my_rank": 14,
+        "entries": [
+            { "rank": 1, "username": "toplearner", "xp": 1450, "level": 23, "avatar": "..." }
+        ]
+    }
+}
+```
+
+---
+
+## Social Endpoints
+
+```
+POST   /api/v1/users/{id}/follow            Follow a user
+DELETE /api/v1/users/{id}/follow            Unfollow
+GET    /api/v1/feed                         Activity feed (following only)
+GET    /api/v1/explore/roadmaps             Public roadmap explorer
+POST   /api/v1/roadmaps/{id}/rate           Rate a public roadmap (1–5)
+POST   /api/v1/roadmaps/{id}/bookmark       Toggle bookmark
+GET    /api/v1/mentors                      Browse mentor directory
+POST   /api/v1/mentors/{id}/request         Send mentorship request
+GET    /api/v1/users/{username}/profile      Public profile
+```
+
+---
+
+## Journal & Mood Endpoints
+
+```
+GET    /api/v1/journal                      List entries (paginated)
+POST   /api/v1/journal                      Create/update today's entry
+GET    /api/v1/journal/{date}               Entry for specific date (YYYY-MM-DD)
+DELETE /api/v1/journal/{date}               Delete entry for date
+POST   /api/v1/mood                         Log today's mood (score 1–5)
+GET    /api/v1/mood/history                 Mood history (30 days)
+```
+
+**POST /api/v1/journal** Request:
+```json
+{
+    "what_i_learned": "Learned about binary trees and traversal algorithms.",
+    "challenges": "Recursion was tricky.",
+    "wins": "Implemented DFS from scratch!",
+    "tomorrow_goals": "Practice BFS next.",
+    "mood_score": 4,
+    "tags": ["algorithms", "data-structures"]
+}
+```
+
+---
+
+## Productivity Endpoints
+
+```
+POST  /api/v1/pomodoro                      Start/complete Pomodoro session
+GET   /api/v1/habits                        List user habits
+POST  /api/v1/habits                        Create habit
+PUT   /api/v1/habits/{id}                   Update habit
+DELETE /api/v1/habits/{id}                  Delete habit
+POST  /api/v1/habits/{id}/log              Mark habit complete for today
+GET   /api/v1/habits/today                  Today's habits with completion status
+```
+
+---
+
+## Analytics Endpoints
+
+```
+GET   /api/v1/analytics/heatmap             52-week activity heatmap data
+GET   /api/v1/analytics/velocity            Learning velocity (topics/week)
+GET   /api/v1/analytics/retention           SRS retention and ease stats
+GET   /api/v1/analytics/report/weekly       Weekly report card
+GET   /api/v1/analytics/time-breakdown      Hours by roadmap/topic
+GET   /api/v1/analytics/skill-matrix        Radar chart by skill category
+```
+
+**GET /api/v1/analytics/heatmap** Response:
+```json
+{
+    "success": true,
+    "data": {
+        "start_date": "2025-03-10",
+        "end_date": "2026-03-09",
+        "max_count": 8,
+        "days": [
+            { "date": "2026-03-09", "count": 5, "minutes": 120 },
+            { "date": "2026-03-08", "count": 3, "minutes": 75 }
+        ]
+    }
+}
+```
+
+---
+
+## Integration Endpoints
+
+```
+POST  /api/v1/integrations/github/connect   Connect GitHub account
+GET   /api/v1/integrations/github/gists     List backup Gists
+POST  /api/v1/integrations/github/backup    Push roadmap to GitHub Gist
+POST  /api/v1/integrations/notion/import    Import pages from Notion
+POST  /api/v1/integrations/calendar/sync    Sync study schedule to Google Calendar
+GET   /api/v1/webhooks                      List webhooks
+POST  /api/v1/webhooks                      Create webhook
+PUT   /api/v1/webhooks/{id}                 Update webhook
+DELETE /api/v1/webhooks/{id}               Delete webhook
+```
+
+**POST /api/v1/webhooks** Request:
+```json
+{
+    "url": "https://my-app.com/hooks/learnforge",
+    "events": ["roadmap.completed", "badge.earned", "certificate.issued"],
+    "secret": "my-signing-secret"
+}
+```
+
+---
+
+## PWA & Push Endpoints
+
+```
+POST    /api/v1/push-subscriptions          Register push subscription
+DELETE  /api/v1/push-subscriptions/{id}    Unregister subscription
+```
+
+---
+
+## Admin Endpoints
+
+> Requires `role=admin`. Only accessible from admin panel.
+
+```
+GET    /api/v1/admin/stats                  Platform metrics (users, roadmaps, active today)
+GET    /api/v1/admin/users                  User list + search
+PATCH  /api/v1/admin/users/{id}/suspend     Suspend user
+PATCH  /api/v1/admin/users/{id}/restore     Restore suspended user
+GET    /api/v1/admin/reports                Moderation queue
+PATCH  /api/v1/admin/reports/{id}/resolve  Resolve report
+GET    /api/v1/admin/feature-flags          Feature flag list
+PATCH  /api/v1/admin/feature-flags/{key}   Toggle feature flag
+```
+
+---
+
+## Public Endpoints
+
+> No authentication required.
+
+```
+GET  /api/public/verify/{uuid}              Verify certificate by UUID
+GET  /badge/{username}/{roadmap-slug}.svg   Progress badge SVG (for GitHub README)
+GET  /u/{username}                          Public user profile page
+GET  /api/public/roadmaps/{slug}            Public roadmap viewer
+```
+
+**GET /badge/{username}/{roadmap-slug}.svg** — Returns an SVG badge:
+```
+[LearnForge | Full Stack Dev | 73% ██████████░░░░]  (dynamic, linkable)
+```
+
+---
+
+## Webhook Events Reference
+
+Webhook payloads are signed with `X-LearnForge-Signature: sha256=<hmac>` using the user's webhook secret.
+
+| Event | Trigger | Key Payload Fields |
+|-------|---------|-------------------|
+| `roadmap.completed` | Roadmap hits 100% | `roadmap_id`, `title`, `composite_score`, `completed_at` |
+| `topic.completed` | Topic marked complete | `topic_id`, `title`, `roadmap_id`, `hours_spent` |
+| `certificate.issued` | Certificate generated | `certificate_number`, `uuid`, `verification_url`, `composite_score` |
+| `badge.earned` | Badge awarded to user | `badge_slug`, `badge_name`, `xp_awarded` |
+| `streak.updated` | Streak incremented | `current_streak`, `longest_streak`, `date` |
+
+---
+
 ## Rate Limiting
 
-### Headers
+### Limits by Endpoint Type
 
-All responses include rate limit headers:
+| Endpoint Type | Limit | Window |
+|--------------|-------|--------|
+| Authenticated (general) | 100 req | 1 minute |
+| Unauthenticated | 20 req | 1 minute |
+| AI endpoints | 10 req | 1 minute |
+| Auth (login/register) | 10 req | 10 minutes |
+| Webhook delivery | 5 req | 1 minute |
 
+### Rate Limit Headers
+
+All responses include:
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1702291200
+X-RateLimit-Reset: 1741526400
 ```
 
 ### Exceeded Limit Response (429)
@@ -1024,4 +1320,11 @@ X-RateLimit-Reset: 1702291200
 
 ## Conclusion
 
-This API documentation provides comprehensive coverage of all endpoints for the Learning Progress Tracker platform. All endpoints follow RESTful conventions and return consistent JSON responses. For implementation details, refer to `backend.md` and `frontend.md`.
+This API documentation covers all v4.0 endpoints for the LearnForge platform. All endpoints follow RESTful conventions and return consistent JSON responses.
+
+- Full interactive API documentation: `/api/docs` (generated by Laravel Scribe)
+- For backend implementation details, refer to [`backend.md`](./backend.md)
+- For frontend API consumption patterns, refer to [`frontend.md`](./frontend.md)
+- For database schema, refer to [`database.md`](./database.md)
+
+*LearnForge API v4.0 — Windows + VSCode Edition. Total cost of all infrastructure: $0.00/month.*

@@ -1,88 +1,71 @@
 # Backend Architecture Documentation
-## Learning Progress Tracker - Laravel Service Pattern Implementation
+## LearnForge — Laravel 12.x Service Pattern
 
-**Version:** 1.0  
-**Last Updated:** December 11, 2025  
-**Framework:** Laravel 12.x  
+**Version:** 4.0 (Windows + VSCode Edition)
+**Last Updated:** March 2026
+**Framework:** Laravel 12.x
 **PHP Version:** 8.3+
+**Dev Environment:** Laragon Full (Windows) — PHP 8.3, MySQL 8, Redis, Nginx, Node.js
 
 ---
 
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
-2. [Service Pattern Implementation](#service-pattern-implementation)
-3. [Directory Structure](#directory-structure)
-4. [Models & Eloquent Relationships](#models--eloquent-relationships)
-5. [Services Layer](#services-layer)
-6. [Controllers](#controllers)
-7. [Form Requests & Validation](#form-requests--validation)
-8. [Repositories (Optional)](#repositories-optional)
-9. [Jobs & Queues](#jobs--queues)
-10. [Events & Listeners](#events--listeners)
-11. [Middleware](#middleware)
-12. [API Resources](#api-resources)
-13. [Database Migrations](#database-migrations)
-14. [Seeders & Factories](#seeders--factories)
-15. [Testing Strategy](#testing-strategy)
-16. [Best Practices](#best-practices)
+2. [Directory Structure](#directory-structure)
+3. [Models & Eloquent Relationships](#models--eloquent-relationships)
+4. [Services Layer](#services-layer)
+5. [Controllers](#controllers)
+6. [Form Requests & Validation](#form-requests--validation)
+7. [Jobs & Queues](#jobs--queues)
+8. [Events & Listeners](#events--listeners)
+9. [Broadcasting (Pusher)](#broadcasting-pusher)
+10. [Middleware](#middleware)
+11. [API Resources](#api-resources)
+12. [Package Reference](#package-reference)
+13. [Testing Strategy](#testing-strategy)
 
 ---
 
 ## Architecture Overview
 
-### Service Pattern Architecture
-
-The Learning Progress Tracker backend follows a **Service-Oriented Architecture** using Laravel's service pattern. This approach separates business logic from controllers, making the codebase more maintainable, testable, and scalable.
+### Service-Oriented Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│              HTTP Request                    │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│              Routes (web.php)                │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│              Middleware                      │
-│  (Auth, CSRF, Throttle, etc.)               │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│              Controllers                     │
-│  (Thin controllers - orchestration only)    │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│           Form Requests                      │
-│  (Validation & Authorization)                │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│              Services                        │
-│  (Business Logic & Complex Operations)      │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│         Models (Eloquent ORM)                │
-│  (Data Access & Relationships)               │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│              Database                        │
-└─────────────────────────────────────────────┘
+HTTP Request
+    │
+    ▼
+Routes (web.php / api.php)
+    │
+    ▼
+Middleware (Auth, CSRF, Throttle, Honeypot)
+    │
+    ▼
+Controllers (thin — orchestration only)
+    │
+    ▼
+Form Requests (Validation & Authorization)
+    │
+    ▼
+Services (Business Logic)
+    │
+    ├── Models (Eloquent ORM)
+    ├── Jobs/Queues (async work)
+    └── Events/Listeners (side effects)
+            │
+            ▼
+        Database (MySQL 8 + Redis)
 ```
 
 ### Key Principles
 
-1. **Single Responsibility**: Each class has one clear purpose
-2. **Dependency Injection**: Services injected via constructor
-3. **Service Container**: Laravel's IoC container manages dependencies
-4. **Eloquent ORM**: All database interactions through Eloquent models
-5. **Form Requests**: Validation separated from controllers
-6. **API Resources**: Consistent data transformation for responses
-7. **Type Hinting**: Strict typing for better IDE support and error prevention
+1. **Thin Controllers**: Controllers only orchestrate — no business logic
+2. **Service Classes**: All domain logic lives in dedicated service classes
+3. **Dependency Injection**: Services injected via constructor
+4. **Eloquent ORM**: All DB interaction through models
+5. **Form Requests**: Validation decoupled from controllers
+6. **Queue for Heavy Work**: AI calls, PDF generation, emails → background jobs
+7. **Event-Driven Side Effects**: XP awards, badge checks, streak updates via events
 
 ---
 
@@ -92,25 +75,51 @@ The Learning Progress Tracker backend follows a **Service-Oriented Architecture*
 app/
 ├── Console/
 │   └── Commands/
-├── Exceptions/
-│   └── Handler.php
+│       ├── GenerateSitemap.php
+│       ├── ProcessSrsSchedule.php
+│       ├── SendWeeklyDigests.php
+│       └── ComputeLeaderboards.php
 ├── Http/
 │   ├── Controllers/
 │   │   ├── Auth/
 │   │   │   ├── LoginController.php
 │   │   │   ├── RegisterController.php
 │   │   │   ├── ForgotPasswordController.php
-│   │   │   └── ResetPasswordController.php
+│   │   │   ├── ResetPasswordController.php
+│   │   │   ├── TwoFactorController.php
+│   │   │   └── SocialiteController.php    # Google/GitHub/LinkedIn OAuth
 │   │   ├── DashboardController.php
 │   │   ├── RoadmapController.php
 │   │   ├── TopicController.php
 │   │   ├── ResourceController.php
-│   │   ├── ProgressController.php
-│   │   └── CertificateController.php
+│   │   ├── CertificateController.php
+│   │   ├── FlashcardController.php
+│   │   ├── ReviewController.php            # SRS review sessions
+│   │   ├── AnalyticsController.php
+│   │   ├── JournalController.php
+│   │   ├── HabitController.php
+│   │   ├── PomodoroController.php
+│   │   ├── NotificationController.php
+│   │   ├── SearchController.php
+│   │   ├── LeaderboardController.php
+│   │   ├── SocialController.php            # Follow, feed, explore
+│   │   ├── ProfileController.php
+│   │   ├── AchievementController.php
+│   │   ├── WebhookController.php
+│   │   ├── IntegrationController.php
+│   │   ├── AIController.php
+│   │   ├── ChangelogController.php
+│   │   ├── LearningPathController.php
+│   │   └── Admin/
+│   │       ├── AdminDashboardController.php
+│   │       ├── UserManagementController.php
+│   │       └── ModerationController.php
 │   ├── Middleware/
 │   │   ├── Authenticate.php
 │   │   ├── CheckRoadmapOwnership.php
-│   │   └── ThrottleApiRequests.php
+│   │   ├── HoneypotMiddleware.php
+│   │   ├── EnsureEmailVerified.php
+│   │   └── AdminOnly.php
 │   ├── Requests/
 │   │   ├── Auth/
 │   │   │   ├── LoginRequest.php
@@ -123,55 +132,139 @@ app/
 │   │   │   ├── StoreTopicRequest.php
 │   │   │   ├── UpdateTopicRequest.php
 │   │   │   └── UpdateTopicStatusRequest.php
-│   │   └── Resource/
-│   │       ├── StoreResourceRequest.php
-│   │       └── UpdateResourceRequest.php
+│   │   ├── Resource/
+│   │   │   ├── StoreResourceRequest.php
+│   │   │   └── UpdateResourceRequest.php
+│   │   └── AI/
+│   │       └── GenerateRoadmapRequest.php
 │   └── Resources/
 │       ├── RoadmapResource.php
 │       ├── TopicResource.php
 │       ├── ResourceResource.php
-│       └── CertificateResource.php
+│       ├── CertificateResource.php
+│       ├── FlashcardResource.php
+│       └── UserResource.php
 ├── Models/
 │   ├── User.php
 │   ├── Roadmap.php
+│   ├── RoadmapPhase.php
 │   ├── Topic.php
+│   ├── TopicDependency.php
 │   ├── Resource.php
 │   ├── ResourceTag.php
-│   ├── TopicProgress.php
+│   ├── FlashcardDeck.php
+│   ├── Flashcard.php
+│   ├── FlashcardReview.php
 │   ├── Certificate.php
-│   └── ActivityLog.php
+│   ├── ActivityLog.php
+│   ├── XpTransaction.php
+│   ├── Badge.php
+│   ├── UserBadge.php
+│   ├── Streak.php
+│   ├── Follow.php
+│   ├── RoadmapRating.php
+│   ├── RoadmapReview.php
+│   ├── RoadmapBookmark.php
+│   ├── RoadmapCollaborator.php
+│   ├── RoadmapComment.php
+│   ├── JournalEntry.php
+│   ├── TopicReflection.php
+│   ├── MoodLog.php
+│   ├── Habit.php
+│   ├── HabitLog.php
+│   ├── Notification.php
+│   ├── PomodoroSession.php
+│   ├── TopicTimeLog.php
+│   ├── Webhook.php
+│   ├── WebhookDelivery.php
+│   ├── Integration.php
+│   ├── UserSkill.php
+│   ├── StudyBuddyPair.php
+│   ├── LearningPath.php
+│   ├── LearningPathItem.php
+│   ├── ChangelogEntry.php
+│   └── UserLoginHistory.php
 ├── Services/
 │   ├── Auth/
 │   │   ├── AuthService.php
+│   │   ├── TwoFactorService.php        # TOTP via pragmarx/google2fa
 │   │   └── PasswordResetService.php
 │   ├── Roadmap/
 │   │   ├── RoadmapService.php
-│   │   └── RoadmapProgressService.php
+│   │   ├── RoadmapProgressService.php
+│   │   ├── RoadmapHealthService.php    # Health score (0-100)
+│   │   └── RoadmapCloneService.php
 │   ├── Topic/
 │   │   ├── TopicService.php
 │   │   └── TopicProgressService.php
 │   ├── Resource/
-│   │   └── ResourceService.php
+│   │   ├── ResourceService.php
+│   │   └── FileUploadService.php
 │   ├── Certificate/
-│   │   └── CertificateService.php
+│   │   ├── CertificateService.php
+│   │   ├── CertificatePdfService.php   # barryvdh/laravel-dompdf
+│   │   └── CertificateVerifyService.php
+│   ├── SRS/
+│   │   ├── SmTwoAlgorithmService.php   # SM-2 algorithm
+│   │   ├── FlashcardService.php
+│   │   └── ReviewSessionService.php
+│   ├── AI/
+│   │   ├── GeminiService.php           # Google Gemini 1.5 Flash HTTP client
+│   │   ├── RoadmapGeneratorService.php
+│   │   ├── FlashcardGeneratorService.php
+│   │   └── AISchedulingService.php
+│   ├── Gamification/
+│   │   ├── XpService.php
+│   │   ├── BadgeService.php
+│   │   ├── StreakService.php
+│   │   └── LeaderboardService.php
 │   ├── Analytics/
-│   │   └── AnalyticsService.php
+│   │   ├── AnalyticsService.php
+│   │   └── HeatmapService.php
+│   ├── Notification/
+│   │   └── NotificationService.php
+│   ├── Social/
+│   │   ├── FollowService.php
+│   │   └── FeedService.php
+│   ├── Search/
+│   │   └── SearchService.php           # TNTSearch via Laravel Scout
+│   ├── Sharing/
+│   │   ├── QrCodeService.php           # simplesoftwareio/simple-qrcode
+│   │   ├── OgImageService.php          # PHP/GD or Browsershot
+│   │   └── BadgeService.php            # SVG progress badges
+│   ├── Export/
+│   │   ├── RoadmapExportService.php    # JSON/MD/CSV/PDF/iCal/Anki
+│   │   └── AccountExportService.php    # GDPR full data export
 │   └── File/
 │       └── FileUploadService.php
-├── Repositories/ (Optional)
-│   ├── RoadmapRepository.php
-│   ├── TopicRepository.php
-│   └── ResourceRepository.php
 ├── Jobs/
 │   ├── GenerateCertificatePdf.php
-│   └── SendCertificateEmail.php
+│   ├── SendCertificateEmail.php
+│   ├── GenerateAIRoadmap.php
+│   ├── GenerateAIFlashcards.php
+│   ├── SendWeeklyDigest.php
+│   ├── ProcessSrsSchedule.php
+│   ├── ComputeLeaderboard.php
+│   ├── GenerateOGImage.php
+│   ├── DeliverWebhook.php
+│   ├── SyncGitHubGist.php
+│   └── SendPushNotification.php
 ├── Events/
 │   ├── RoadmapCompleted.php
 │   ├── TopicCompleted.php
-│   └── CertificateGenerated.php
+│   ├── TopicStatusChanged.php
+│   ├── CertificateGenerated.php
+│   ├── BadgeEarned.php
+│   ├── LevelUp.php
+│   ├── StreakUpdated.php
+│   └── SrsReviewCompleted.php
 ├── Listeners/
+│   ├── AwardXpForTopicCompletion.php
+│   ├── CheckAndAwardBadges.php
 │   ├── UpdateRoadmapProgress.php
-│   ├── GenerateCertificate.php
+│   ├── UpdateStreak.php
+│   ├── BroadcastNotification.php
+│   ├── TriggerWebhooks.php
 │   └── LogUserActivity.php
 └── Providers/
     ├── AppServiceProvider.php
@@ -194,68 +287,66 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, HasApiTokens;
 
     protected $fillable = [
-        'username',
-        'email',
-        'password',
-        'full_name',
-        'profession',
-        'bio',
-        'profile_picture',
+        'username', 'email', 'password', 'full_name', 'headline', 'profession',
+        'bio', 'location', 'website', 'github_username', 'linkedin_url', 'twitter_username',
+        'profile_picture', 'cover_image', 'timezone', 'locale', 'theme', 'accent_color',
+        'available_hours_week', 'is_mentor', 'is_public',
+        'two_factor_secret', 'two_factor_confirmed',
+        'onboarding_completed', 'last_active_at',
     ];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token', 'two_factor_secret'];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'email_verified_at'    => 'datetime',
+        'password'             => 'hashed',
+        'is_mentor'            => 'boolean',
+        'is_public'            => 'boolean',
+        'two_factor_confirmed' => 'boolean',
+        'onboarding_completed' => 'boolean',
+        'available_hours_week' => 'decimal:1',
+        'last_active_at'       => 'datetime',
+        'deleted_at'           => 'datetime',
     ];
 
-    // Relationships
-    public function roadmaps()
+    // ── Relationships ──
+    public function roadmaps()        { return $this->hasMany(Roadmap::class); }
+    public function certificates()    { return $this->hasMany(Certificate::class); }
+    public function flashcardDecks()  { return $this->hasMany(FlashcardDeck::class); }
+    public function streak()          { return $this->hasOne(Streak::class); }
+    public function xpTransactions()  { return $this->hasMany(XpTransaction::class); }
+    public function badges()          { return $this->belongsToMany(Badge::class, 'user_badges')->withTimestamps(); }
+    public function journalEntries()  { return $this->hasMany(JournalEntry::class); }
+    public function habits()          { return $this->hasMany(Habit::class); }
+    public function pomodoroSessions(){ return $this->hasMany(PomodoroSession::class); }
+    public function skills()          { return $this->hasMany(UserSkill::class); }
+    public function activityLogs()    { return $this->hasMany(ActivityLog::class); }
+    public function following()       { return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id'); }
+    public function followers()       { return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id'); }
+    public function notifications()   { return $this->hasMany(Notification::class); }
+    public function webhooks()        { return $this->hasMany(Webhook::class); }
+
+    // ── Helpers ──
+    public function getTotalXpAttribute(): int
     {
-        return $this->hasMany(Roadmap::class);
+        return $this->xpTransactions()->sum('amount');
     }
 
-    public function certificates()
+    public function getProfileUrlAttribute(): string
     {
-        return $this->hasMany(Certificate::class);
+        return route('profile.show', $this->username);
     }
 
-    public function topicProgress()
-    {
-        return $this->hasMany(TopicProgress::class);
-    }
-
-    public function activityLogs()
-    {
-        return $this->hasMany(ActivityLog::class);
-    }
-
-    // Accessors
-    public function getProfilePictureUrlAttribute()
-    {
-        return $this->profile_picture 
-            ? Storage::url($this->profile_picture)
-            : asset('images/default-avatar.png');
-    }
-
-    // Scopes
-    public function scopeActive($query)
-    {
-        return $query->whereNull('deleted_at');
-    }
+    // ── Scopes ──
+    public function scopePublic($query)  { return $query->where('is_public', true); }
+    public function scopeMentors($query) { return $query->where('is_mentor', true); }
 }
 ```
 
@@ -276,85 +367,59 @@ class Roadmap extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
-        'title',
-        'slug',
-        'description',
-        'category',
-        'difficulty_level',
-        'target_completion_date',
-        'is_public',
-        'total_score',
-        'progress_percentage',
-        'status',
+        'user_id', 'title', 'slug', 'description', 'category', 'cover_image',
+        'difficulty_level', 'tags', 'target_completion_date', 'is_public', 'visibility',
+        'total_score', 'progress_percentage', 'weighted_progress', 'quality_score',
+        'composite_score', 'status', 'cloned_from_id',
+        'total_clones', 'total_views', 'total_bookmarks', 'average_rating', 'ratings_count',
     ];
 
     protected $casts = [
+        'tags'                   => 'array',
         'target_completion_date' => 'date',
-        'is_public' => 'boolean',
-        'total_score' => 'decimal:2',
-        'progress_percentage' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'is_public'              => 'boolean',
+        'total_score'            => 'decimal:2',
+        'progress_percentage'    => 'decimal:2',
+        'weighted_progress'      => 'decimal:2',
+        'quality_score'          => 'decimal:2',
+        'composite_score'        => 'decimal:2',
+        'average_rating'         => 'decimal:2',
+        'deleted_at'             => 'datetime',
     ];
 
-    // Boot method for auto-generating slug
     protected static function boot()
     {
         parent::boot();
-
         static::creating(function ($roadmap) {
             if (empty($roadmap->slug)) {
-                $roadmap->slug = Str::slug($roadmap->title);
+                $roadmap->slug = Str::slug($roadmap->title) . '-' . Str::random(6);
             }
         });
     }
 
-    // Relationships
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    // ── Relationships ──
+    public function user()          { return $this->belongsTo(User::class); }
+    public function phases()        { return $this->hasMany(RoadmapPhase::class)->orderBy('order_index'); }
+    public function topics()        { return $this->hasMany(Topic::class)->orderBy('order_index'); }
+    public function certificates()  { return $this->hasMany(Certificate::class); }
+    public function collaborators() { return $this->belongsToMany(User::class, 'roadmap_collaborators')->withPivot('role'); }
+    public function ratings()       { return $this->hasMany(RoadmapRating::class); }
+    public function reviews()       { return $this->hasMany(RoadmapReview::class); }
+    public function comments()      { return $this->hasMany(RoadmapComment::class); }
+    public function clonedFrom()    { return $this->belongsTo(Roadmap::class, 'cloned_from_id'); }
 
-    public function topics()
-    {
-        return $this->hasMany(Topic::class)->orderBy('order_index');
-    }
+    // ── Scopes ──
+    public function scopeActive($query)    { return $query->where('status', 'active'); }
+    public function scopeCompleted($query) { return $query->where('status', 'completed'); }
+    public function scopePublic($query)    { return $query->where('is_public', true)->where('status', 'active'); }
 
-    public function certificates()
-    {
-        return $this->hasMany(Certificate::class);
-    }
-
-    // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'active');
-    }
-
-    public function scopeCompleted($query)
-    {
-        return $query->where('status', 'completed');
-    }
-
-    public function scopePublic($query)
-    {
-        return $query->where('is_public', true);
-    }
-
-    // Accessors
-    public function getIsCompletedAttribute()
-    {
-        return $this->progress_percentage >= 100;
-    }
-
-    public function getTotalTopicsAttribute()
+    // ── Accessors ──
+    public function getTotalTopicsAttribute(): int
     {
         return $this->topics()->count();
     }
 
-    public function getCompletedTopicsAttribute()
+    public function getCompletedTopicsAttribute(): int
     {
         return $this->topics()->where('status', 'completed')->count();
     }
@@ -376,241 +441,40 @@ class Topic extends Model
     use HasFactory;
 
     protected $fillable = [
-        'roadmap_id',
-        'parent_topic_id',
-        'title',
-        'description',
-        'estimated_hours',
-        'difficulty_level',
-        'order_index',
-        'weight',
-        'status',
-        'completed_at',
+        'roadmap_id', 'phase_id', 'parent_topic_id', 'title', 'description',
+        'estimated_hours', 'actual_hours', 'difficulty_level', 'priority',
+        'order_index', 'weight', 'status', 'quality_rating', 'confidence_level',
+        'started_at', 'completed_at', 'scheduled_date', 'due_date',
     ];
 
     protected $casts = [
-        'estimated_hours' => 'decimal:2',
-        'order_index' => 'integer',
-        'weight' => 'integer',
-        'completed_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'estimated_hours'  => 'decimal:2',
+        'actual_hours'     => 'decimal:2',
+        'priority'         => 'integer',
+        'order_index'      => 'integer',
+        'weight'           => 'integer',
+        'quality_rating'   => 'integer',
+        'confidence_level' => 'integer',
+        'started_at'       => 'datetime',
+        'completed_at'     => 'datetime',
+        'scheduled_date'   => 'date',
+        'due_date'         => 'date',
     ];
 
-    // Relationships
-    public function roadmap()
-    {
-        return $this->belongsTo(Roadmap::class);
-    }
+    public function roadmap()      { return $this->belongsTo(Roadmap::class); }
+    public function phase()        { return $this->belongsTo(RoadmapPhase::class); }
+    public function parentTopic()  { return $this->belongsTo(Topic::class, 'parent_topic_id'); }
+    public function subTopics()    { return $this->hasMany(Topic::class, 'parent_topic_id')->orderBy('order_index'); }
+    public function resources()    { return $this->hasMany(Resource::class)->orderBy('order_index'); }
+    public function timeLogs()     { return $this->hasMany(TopicTimeLog::class); }
+    public function flashcardDecks() { return $this->hasMany(FlashcardDeck::class); }
+    public function prerequisites(){ return $this->belongsToMany(Topic::class, 'topic_dependencies', 'topic_id', 'depends_on_id'); }
+    public function reflections()  { return $this->hasMany(TopicReflection::class); }
 
-    public function parentTopic()
-    {
-        return $this->belongsTo(Topic::class, 'parent_topic_id');
-    }
-
-    public function subTopics()
-    {
-        return $this->hasMany(Topic::class, 'parent_topic_id')->orderBy('order_index');
-    }
-
-    public function resources()
-    {
-        return $this->hasMany(Resource::class)->orderBy('order_index');
-    }
-
-    public function progress()
-    {
-        return $this->hasMany(TopicProgress::class);
-    }
-
-    // Scopes
-    public function scopeRootTopics($query)
-    {
-        return $query->whereNull('parent_topic_id');
-    }
-
-    public function scopeCompleted($query)
-    {
-        return $query->where('status', 'completed');
-    }
-
-    public function scopeInProgress($query)
-    {
-        return $query->where('status', 'in_progress');
-    }
-
-    // Accessors
-    public function getIsCompletedAttribute()
-    {
-        return $this->status === 'completed';
-    }
-
-    public function getResourceCountAttribute()
-    {
-        return $this->resources()->count();
-    }
-}
-```
-
-### Resource Model
-
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-
-class Resource extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'topic_id',
-        'resource_type',
-        'title',
-        'description',
-        'content',
-        'file_path',
-        'file_size',
-        'url',
-        'is_favorite',
-        'order_index',
-    ];
-
-    protected $casts = [
-        'file_size' => 'integer',
-        'is_favorite' => 'boolean',
-        'order_index' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    // Relationships
-    public function topic()
-    {
-        return $this->belongsTo(Topic::class);
-    }
-
-    public function tags()
-    {
-        return $this->hasMany(ResourceTag::class);
-    }
-
-    // Accessors
-    public function getFileUrlAttribute()
-    {
-        return $this->file_path ? Storage::url($this->file_path) : null;
-    }
-
-    public function getFileSizeHumanAttribute()
-    {
-        if (!$this->file_size) return null;
-
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $size = $this->file_size;
-        $unit = 0;
-
-        while ($size >= 1024 && $unit < count($units) - 1) {
-            $size /= 1024;
-            $unit++;
-        }
-
-        return round($size, 2) . ' ' . $units[$unit];
-    }
-
-    // Scopes
-    public function scopeFavorites($query)
-    {
-        return $query->where('is_favorite', true);
-    }
-
-    public function scopeByType($query, $type)
-    {
-        return $query->where('resource_type', $type);
-    }
-}
-```
-
-### Certificate Model
-
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-
-class Certificate extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'uuid',
-        'user_id',
-        'roadmap_id',
-        'certificate_number',
-        'issued_at',
-        'total_topics',
-        'total_learning_hours',
-        'topics_summary',
-        'template_type',
-        'file_path',
-        'verification_url',
-    ];
-
-    protected $casts = [
-        'issued_at' => 'datetime',
-        'total_topics' => 'integer',
-        'total_learning_hours' => 'decimal:2',
-        'topics_summary' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    // Boot method
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($certificate) {
-            if (empty($certificate->uuid)) {
-                $certificate->uuid = (string) Str::uuid();
-            }
-            if (empty($certificate->certificate_number)) {
-                $certificate->certificate_number = 'CERT-' . strtoupper(Str::random(10));
-            }
-            if (empty($certificate->verification_url)) {
-                $certificate->verification_url = route('certificate.verify', $certificate->uuid);
-            }
-        });
-    }
-
-    // Relationships
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function roadmap()
-    {
-        return $this->belongsTo(Roadmap::class);
-    }
-
-    // Accessors
-    public function getDownloadUrlAttribute()
-    {
-        return route('certificate.download', $this->uuid);
-    }
-
-    public function getFileUrlAttribute()
-    {
-        return $this->file_path ? Storage::url($this->file_path) : null;
-    }
+    public function scopeRootTopics($query)  { return $query->whereNull('parent_topic_id'); }
+    public function scopeCompleted($query)   { return $query->where('status', 'completed'); }
+    public function scopeInProgress($query)  { return $query->where('status', 'in_progress'); }
+    public function scopeOverdue($query)     { return $query->whereNotNull('due_date')->where('due_date', '<', now())->whereNotIn('status', ['completed', 'skipped']); }
 }
 ```
 
@@ -618,485 +482,263 @@ class Certificate extends Model
 
 ## Services Layer
 
-### RoadmapService
+### SRS SM-2 Algorithm Service
 
 ```php
 <?php
 
-namespace App\Services\Roadmap;
+namespace App\Services\SRS;
 
-use App\Models\Roadmap;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Models\Flashcard;
+use Carbon\Carbon;
 
-class RoadmapService
+class SmTwoAlgorithmService
 {
     /**
-     * Create a new roadmap
+     * Process a card review using the SM-2 algorithm.
+     * Ratings: 1=Again, 2=Hard, 3=Good, 4=Easy
      */
-    public function createRoadmap(User $user, array $data): Roadmap
+    public function processReview(Flashcard $card, int $rating): array
     {
-        return DB::transaction(function () use ($user, $data) {
-            $roadmap = $user->roadmaps()->create([
-                'title' => $data['title'],
-                'slug' => $this->generateUniqueSlug($data['title']),
-                'description' => $data['description'] ?? null,
-                'category' => $data['category'] ?? null,
-                'difficulty_level' => $data['difficulty_level'] ?? null,
-                'target_completion_date' => $data['target_completion_date'] ?? null,
-                'status' => 'active',
-                'progress_percentage' => 0,
-                'total_score' => 0,
-            ]);
+        $ease        = $card->ease_factor;
+        $interval    = $card->interval_days;
+        $repetitions = $card->repetitions;
 
-            // Log activity
-            $this->logActivity($user, 'created_roadmap', $roadmap);
-
-            return $roadmap;
-        });
-    }
-
-    /**
-     * Update roadmap
-     */
-    public function updateRoadmap(Roadmap $roadmap, array $data): Roadmap
-    {
-        return DB::transaction(function () use ($roadmap, $data) {
-            $roadmap->update([
-                'title' => $data['title'] ?? $roadmap->title,
-                'description' => $data['description'] ?? $roadmap->description,
-                'category' => $data['category'] ?? $roadmap->category,
-                'difficulty_level' => $data['difficulty_level'] ?? $roadmap->difficulty_level,
-                'target_completion_date' => $data['target_completion_date'] ?? $roadmap->target_completion_date,
-            ]);
-
-            return $roadmap->fresh();
-        });
-    }
-
-    /**
-     * Delete roadmap (soft delete)
-     */
-    public function deleteRoadmap(Roadmap $roadmap): bool
-    {
-        return DB::transaction(function () use ($roadmap) {
-            // Archive associated data
-            $roadmap->topics()->delete();
-            
-            return $roadmap->delete();
-        });
-    }
-
-    /**
-     * Clone a roadmap
-     */
-    public function cloneRoadmap(Roadmap $sourceRoadmap, User $user): Roadmap
-    {
-        return DB::transaction(function () use ($sourceRoadmap, $user) {
-            $newRoadmap = $this->createRoadmap($user, [
-                'title' => $sourceRoadmap->title . ' (Copy)',
-                'description' => $sourceRoadmap->description,
-                'category' => $sourceRoadmap->category,
-                'difficulty_level' => $sourceRoadmap->difficulty_level,
-            ]);
-
-            // Clone topics
-            foreach ($sourceRoadmap->topics as $topic) {
-                $this->cloneTopic($topic, $newRoadmap);
-            }
-
-            return $newRoadmap;
-        });
-    }
-
-    /**
-     * Generate shareable link
-     */
-    public function generateShareableLink(Roadmap $roadmap): string
-    {
-        $roadmap->update(['is_public' => true]);
-        
-        return route('roadmap.public', [
-            'username' => $roadmap->user->username,
-            'slug' => $roadmap->slug
-        ]);
-    }
-
-    /**
-     * Reorder topics
-     */
-    public function reorderTopics(Roadmap $roadmap, array $topicIds): void
-    {
-        DB::transaction(function () use ($roadmap, $topicIds) {
-            foreach ($topicIds as $index => $topicId) {
-                $roadmap->topics()
-                    ->where('id', $topicId)
-                    ->update(['order_index' => $index]);
-            }
-        });
-    }
-
-    /**
-     * Generate unique slug
-     */
-    private function generateUniqueSlug(string $title): string
-    {
-        $slug = Str::slug($title);
-        $count = 1;
-
-        while (Roadmap::where('slug', $slug)->exists()) {
-            $slug = Str::slug($title) . '-' . $count;
-            $count++;
-        }
-
-        return $slug;
-    }
-
-    /**
-     * Clone a topic
-     */
-    private function cloneTopic($topic, $newRoadmap, $parentId = null): void
-    {
-        $newTopic = $newRoadmap->topics()->create([
-            'parent_topic_id' => $parentId,
-            'title' => $topic->title,
-            'description' => $topic->description,
-            'estimated_hours' => $topic->estimated_hours,
-            'difficulty_level' => $topic->difficulty_level,
-            'order_index' => $topic->order_index,
-            'weight' => $topic->weight,
-            'status' => 'not_started',
-        ]);
-
-        // Clone sub-topics recursively
-        foreach ($topic->subTopics as $subTopic) {
-            $this->cloneTopic($subTopic, $newRoadmap, $newTopic->id);
-        }
-    }
-
-    /**
-     * Log user activity
-     */
-    private function logActivity(User $user, string $action, $model): void
-    {
-        $user->activityLogs()->create([
-            'action_type' => $action,
-            'description' => "User {$action} {$model->title}",
-            'metadata' => [
-                'model_type' => get_class($model),
-                'model_id' => $model->id,
+        match ($rating) {
+            1 => [ // Again — reset
+                $ease        = max(1.3, $ease - 0.20),
+                $interval    = 1,
+                $repetitions = 0,
             ],
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
+            2 => [ // Hard
+                $ease        = max(1.3, $ease - 0.15),
+                $interval    = max(1, (int) ($interval * 1.2)),
+            ],
+            3 => [ // Good
+                $interval    = $repetitions === 0 ? 1 : ($repetitions === 1 ? 6 : (int) round($interval * $ease)),
+                $repetitions = $repetitions + 1,
+            ],
+            4 => [ // Easy
+                $ease        = $ease + 0.15,
+                $interval    = $repetitions === 0 ? 4 : (int) round($interval * $ease * 1.3),
+                $repetitions = $repetitions + 1,
+            ],
+        };
+
+        $nextReviewAt = Carbon::now()->addDays($interval);
+
+        $card->update([
+            'ease_factor'    => round($ease, 2),
+            'interval_days'  => $interval,
+            'repetitions'    => $repetitions,
+            'next_review_at' => $nextReviewAt,
+            'status'         => $rating === 1 ? 'relearning' : ($interval >= 21 ? 'review' : 'learning'),
         ]);
-    }
-}
-```
-
-### RoadmapProgressService
-
-```php
-<?php
-
-namespace App\Services\Roadmap;
-
-use App\Models\Roadmap;
-use App\Models\Topic;
-use Illuminate\Support\Facades\DB;
-
-class RoadmapProgressService
-{
-    /**
-     * Calculate and update roadmap progress
-     */
-    public function calculateProgress(Roadmap $roadmap): void
-    {
-        DB::transaction(function () use ($roadmap) {
-            $topics = $roadmap->topics;
-            $totalTopics = $topics->count();
-
-            if ($totalTopics === 0) {
-                $roadmap->update([
-                    'progress_percentage' => 0,
-                    'total_score' => 0,
-                ]);
-                return;
-            }
-
-            $completedTopics = $topics->where('status', 'completed')->count();
-            $progressPercentage = ($completedTopics / $totalTopics) * 100;
-
-            // Calculate weighted score
-            $totalWeight = $topics->sum('weight');
-            $completedWeight = $topics->where('status', 'completed')->sum('weight');
-            $score = $totalWeight > 0 ? ($completedWeight / $totalWeight) * 100 : 0;
-
-            $roadmap->update([
-                'progress_percentage' => round($progressPercentage, 2),
-                'total_score' => round($score, 2),
-                'status' => $progressPercentage >= 100 ? 'completed' : 'active',
-            ]);
-
-            // Trigger certificate generation if completed
-            if ($progressPercentage >= 100 && $roadmap->certificates()->count() === 0) {
-                event(new \App\Events\RoadmapCompleted($roadmap));
-            }
-        });
-    }
-
-    /**
-     * Get detailed progress statistics
-     */
-    public function getProgressStats(Roadmap $roadmap): array
-    {
-        $topics = $roadmap->topics;
 
         return [
-            'total_topics' => $topics->count(),
-            'completed_topics' => $topics->where('status', 'completed')->count(),
-            'in_progress_topics' => $topics->where('status', 'in_progress')->count(),
-            'not_started_topics' => $topics->where('status', 'not_started')->count(),
-            'skipped_topics' => $topics->where('status', 'skipped')->count(),
-            'progress_percentage' => $roadmap->progress_percentage,
-            'total_score' => $roadmap->total_score,
-            'estimated_total_hours' => $topics->sum('estimated_hours'),
-            'actual_total_hours' => $this->calculateActualHours($roadmap),
+            'new_interval'    => $interval,
+            'next_review_at'  => $nextReviewAt->toDateString(),
+            'ease_factor'     => $ease,
         ];
     }
 
-    /**
-     * Calculate actual hours spent
-     */
-    private function calculateActualHours(Roadmap $roadmap): float
+    public function getDueCards(int $userId, int $deckId = null): \Illuminate\Database\Eloquent\Collection
     {
-        return $roadmap->topics()
-            ->with('progress')
-            ->get()
-            ->flatMap->progress
-            ->sum('actual_hours');
+        $query = Flashcard::query()
+            ->whereHas('deck', fn($q) => $q->where('user_id', $userId))
+            ->where('next_review_at', '<=', now())
+            ->whereNotIn('status', ['suspended']);
+
+        if ($deckId) {
+            $query->where('deck_id', $deckId);
+        }
+
+        return $query->inRandomOrder()->get();
     }
 }
 ```
 
-### TopicService
+### AI (Gemini) Service
 
 ```php
 <?php
 
-namespace App\Services\Topic;
+namespace App\Services\AI;
 
-use App\Models\Roadmap;
-use App\Models\Topic;
-use App\Services\Roadmap\RoadmapProgressService;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-class TopicService
+class GeminiService
 {
-    public function __construct(
-        private RoadmapProgressService $progressService
-    ) {}
+    private string $apiKey;
+    private string $model = 'gemini-1.5-flash';
+    private string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
 
-    /**
-     * Create a new topic
-     */
-    public function createTopic(Roadmap $roadmap, array $data): Topic
+    public function __construct()
     {
-        return DB::transaction(function () use ($roadmap, $data) {
-            $orderIndex = $roadmap->topics()->max('order_index') + 1;
+        $this->apiKey = config('services.gemini.key');
+    }
 
-            $topic = $roadmap->topics()->create([
-                'parent_topic_id' => $data['parent_topic_id'] ?? null,
-                'title' => $data['title'],
-                'description' => $data['description'] ?? null,
-                'estimated_hours' => $data['estimated_hours'],
-                'difficulty_level' => $data['difficulty_level'] ?? null,
-                'order_index' => $orderIndex,
-                'weight' => $data['weight'] ?? 1,
-                'status' => 'not_started',
+    public function generateRoadmap(string $prompt): array
+    {
+        $systemPrompt = "You are an expert learning roadmap creator. Generate a structured learning roadmap as JSON with: title, description, category, difficulty, estimated_weeks, topics (array of {title, description, estimated_hours, difficulty, resources[]}).";
+
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+            ->timeout(30)
+            ->post("{$this->baseUrl}/models/{$this->model}:generateContent?key={$this->apiKey}", [
+                'contents' => [
+                    ['role' => 'user', 'parts' => [['text' => $systemPrompt . "\n\n" . $prompt]]]
+                ],
+                'generationConfig' => [
+                    'responseMimeType' => 'application/json',
+                    'temperature'      => 0.7,
+                    'maxOutputTokens'  => 8192,
+                ],
             ]);
 
-            $this->progressService->calculateProgress($roadmap);
-
-            return $topic;
-        });
-    }
-
-    /**
-     * Update topic
-     */
-    public function updateTopic(Topic $topic, array $data): Topic
-    {
-        return DB::transaction(function () use ($topic, $data) {
-            $topic->update($data);
-
-            $this->progressService->calculateProgress($topic->roadmap);
-
-            return $topic->fresh();
-        });
-    }
-
-    /**
-     * Update topic status
-     */
-    public function updateStatus(Topic $topic, string $status): Topic
-    {
-        return DB::transaction(function () use ($topic, $status) {
-            $updateData = ['status' => $status];
-
-            if ($status === 'completed' && !$topic->completed_at) {
-                $updateData['completed_at'] = now();
-                event(new \App\Events\TopicCompleted($topic));
-            }
-
-            $topic->update($updateData);
-
-            $this->progressService->calculateProgress($topic->roadmap);
-
-            return $topic->fresh();
-        });
-    }
-
-    /**
-     * Delete topic
-     */
-    public function deleteTopic(Topic $topic): bool
-    {
-        return DB::transaction(function () use ($topic) {
-            $roadmap = $topic->roadmap;
-
-            // Delete all sub-topics recursively
-            $this->deleteSubTopics($topic);
-
-            $result = $topic->delete();
-
-            $this->progressService->calculateProgress($roadmap);
-
-            return $result;
-        });
-    }
-
-    /**
-     * Move topic to different roadmap
-     */
-    public function moveTopic(Topic $topic, Roadmap $targetRoadmap): Topic
-    {
-        return DB::transaction(function () use ($topic, $targetRoadmap) {
-            $oldRoadmap = $topic->roadmap;
-
-            $topic->update([
-                'roadmap_id' => $targetRoadmap->id,
-                'order_index' => $targetRoadmap->topics()->max('order_index') + 1,
-            ]);
-
-            $this->progressService->calculateProgress($oldRoadmap);
-            $this->progressService->calculateProgress($targetRoadmap);
-
-            return $topic->fresh();
-        });
-    }
-
-    /**
-     * Delete sub-topics recursively
-     */
-    private function deleteSubTopics(Topic $topic): void
-    {
-        foreach ($topic->subTopics as $subTopic) {
-            $this->deleteSubTopics($subTopic);
-            $subTopic->delete();
+        if ($response->failed()) {
+            Log::error('Gemini API error', ['status' => $response->status(), 'body' => $response->body()]);
+            throw new \RuntimeException('AI service unavailable. Please try again.');
         }
+
+        $text = $response->json('candidates.0.content.parts.0.text');
+        return json_decode($text, true) ?? [];
+    }
+
+    public function generateFlashcards(string $topicContent, int $count = 10): array
+    {
+        $prompt = "Generate {$count} flashcards from this content. Return JSON array of {front, back}.\n\n{$topicContent}";
+        return $this->generateRoadmap($prompt); // reuses the same HTTP call pattern
     }
 }
 ```
 
-### CertificateService
+### XP Service (Gamification)
 
 ```php
 <?php
 
-namespace App\Services\Certificate;
+namespace App\Services\Gamification;
 
-use App\Models\Certificate;
-use App\Models\Roadmap;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\XpTransaction;
+use App\Events\LevelUp;
 
-class CertificateService
+class XpService
 {
-    /**
-     * Generate certificate for completed roadmap
-     */
-    public function generateCertificate(Roadmap $roadmap, string $templateType = 'modern'): Certificate
+    const XP_TABLE = [
+        'create_roadmap'      => 100,
+        'add_topic'           => 10,
+        'complete_topic'      => 50,
+        'complete_roadmap'    => 500,
+        'log_study_hour'      => 25,
+        'daily_streak'        => 15,
+        'rate_topic'          => 10,
+        'srs_review_session'  => 20,
+        'srs_all_cards_today' => 50,
+        'add_resource'        => 5,
+        'add_note'            => 5,
+        'share_roadmap'       => 25,
+        'roadmap_cloned'      => 50,
+        'streak_7day'         => 200,
+        'streak_30day'        => 1000,
+        'journal_entry'       => 10,
+    ];
+
+    public function award(User $user, string $action, ?int $referenceId = null): int
     {
-        // Verify roadmap is completed
-        if ($roadmap->progress_percentage < 100) {
-            throw new \Exception('Roadmap must be 100% completed to generate certificate');
-        }
+        $amount = self::XP_TABLE[$action] ?? 0;
+        if ($amount === 0) return 0;
 
-        // Check if certificate already exists
-        $existingCertificate = $roadmap->certificates()->first();
-        if ($existingCertificate) {
-            return $existingCertificate;
-        }
+        $prevXp = $user->total_xp;
 
-        $certificate = $this->createCertificate($roadmap, $templateType);
-        $this->generatePdf($certificate);
-
-        return $certificate;
-    }
-
-    /**
-     * Create certificate record
-     */
-    private function createCertificate(Roadmap $roadmap, string $templateType): Certificate
-    {
-        $topicsSummary = $roadmap->topics->map(function ($topic) {
-            return [
-                'title' => $topic->title,
-                'completed_at' => $topic->completed_at?->format('Y-m-d'),
-                'hours' => $topic->estimated_hours,
-            ];
-        })->toArray();
-
-        return Certificate::create([
-            'user_id' => $roadmap->user_id,
-            'roadmap_id' => $roadmap->id,
-            'issued_at' => now(),
-            'total_topics' => $roadmap->topics()->count(),
-            'total_learning_hours' => $roadmap->topics()->sum('estimated_hours'),
-            'topics_summary' => $topicsSummary,
-            'template_type' => $templateType,
-        ]);
-    }
-
-    /**
-     * Generate PDF
-     */
-    private function generatePdf(Certificate $certificate): void
-    {
-        $pdf = Pdf::loadView("certificates.templates.{$certificate->template_type}", [
-            'certificate' => $certificate,
-            'user' => $certificate->user,
-            'roadmap' => $certificate->roadmap,
+        XpTransaction::create([
+            'user_id'      => $user->id,
+            'amount'       => $amount,
+            'action'       => $action,
+            'reference_id' => $referenceId,
+            'description'  => ucreplace('_', ' ', $action),
         ]);
 
-        $filename = "certificate-{$certificate->uuid}.pdf";
-        $path = "certificates/{$certificate->user_id}/{$filename}";
+        // Check for level-up
+        $newXp = $prevXp + $amount;
+        if ($this->getLevel($newXp) > $this->getLevel($prevXp)) {
+            event(new LevelUp($user, $this->getLevel($newXp)));
+        }
 
-        Storage::put($path, $pdf->output());
-
-        $certificate->update(['file_path' => $path]);
+        return $amount;
     }
 
-    /**
-     * Get verification data
-     */
-    public function verifyCertificate(string $uuid): ?Certificate
+    public function getLevel(int $xp): int
     {
-        return Certificate::with(['user', 'roadmap'])
-            ->where('uuid', $uuid)
-            ->first();
+        return match(true) {
+            $xp >= 200001 => (int) (76 + ($xp - 200001) / 10000),
+            $xp >= 75001  => (int) (51 + ($xp - 75001) / 5000),
+            $xp >= 20001  => (int) (26 + ($xp - 20001) / 2222),
+            $xp >= 5001   => (int) (11 + ($xp - 5001) / 1000),
+            default       => max(1, (int) ($xp / 500) + 1),
+        };
+    }
+}
+```
+
+### Roadmap Progress Service
+
+```php
+<?php
+
+namespace App\Services\Roadmap;
+
+use App\Models\Roadmap;
+
+class RoadmapProgressService
+{
+    public function recalculate(Roadmap $roadmap): void
+    {
+        $topics = $roadmap->topics()->get();
+        $total  = $topics->count();
+
+        if ($total === 0) {
+            $roadmap->update(['progress_percentage' => 0, 'composite_score' => 0]);
+            return;
+        }
+
+        $completed    = $topics->where('status', 'completed')->count();
+        $completionPc = round(($completed / $total) * 100, 2);
+
+        // Weighted progress
+        $totalWeight     = $topics->sum('weight');
+        $completedWeight = $topics->where('status', 'completed')->sum('weight');
+        $weightedPc = $totalWeight > 0
+            ? round(($completedWeight / $totalWeight) * 100, 2)
+            : $completionPc;
+
+        // Time efficiency
+        $estimatedHrs = $topics->sum('estimated_hours');
+        $actualHrs    = $topics->sum('actual_hours');
+        $timePc = $estimatedHrs > 0 && $actualHrs > 0
+            ? round(min(100, ($estimatedHrs / $actualHrs) * 100), 2)
+            : 50;
+
+        // Quality score (completed topics with ratings)
+        $ratedTopics = $topics->where('status', 'completed')->whereNotNull('quality_rating');
+        $qualityPc   = $ratedTopics->count() > 0
+            ? round(($ratedTopics->avg('quality_rating') / 5) * 100, 2)
+            : 50;
+
+        // Composite (weighted average)
+        $composite = round(
+            ($completionPc * 0.40) + ($weightedPc * 0.30) + ($timePc * 0.15) + ($qualityPc * 0.15),
+            2
+        );
+
+        $roadmap->update([
+            'progress_percentage' => $completionPc,
+            'weighted_progress'   => $weightedPc,
+            'quality_score'       => $qualityPc,
+            'composite_score'     => $composite,
+            'status'              => $completionPc >= 100 ? 'completed' : 'active',
+        ]);
     }
 }
 ```
@@ -1105,7 +747,7 @@ class CertificateService
 
 ## Controllers
 
-### RoadmapController
+### RoadmapController (thin)
 
 ```php
 <?php
@@ -1114,147 +756,133 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Roadmap\StoreRoadmapRequest;
 use App\Http\Requests\Roadmap\UpdateRoadmapRequest;
-use App\Models\Roadmap;
 use App\Services\Roadmap\RoadmapService;
-use App\Services\Roadmap\RoadmapProgressService;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use App\Models\Roadmap;
+use Illuminate\Http\Request;
 
 class RoadmapController extends Controller
 {
-    public function __construct(
-        private RoadmapService $roadmapService,
-        private RoadmapProgressService $progressService
-    ) {
-        $this->middleware('auth');
-    }
+    public function __construct(private RoadmapService $roadmapService) {}
 
-    /**
-     * Display listing of roadmaps
-     */
-    public function index(): View
+    public function index()
     {
-        $roadmaps = auth()->user()
-            ->roadmaps()
-            ->with('topics')
-            ->latest()
+        $roadmaps = auth()->user()->roadmaps()
+            ->with(['topics', 'certificates'])
+            ->latest('updated_at')
             ->paginate(12);
 
         return view('roadmaps.index', compact('roadmaps'));
     }
 
-    /**
-     * Show create form
-     */
-    public function create(): View
+    public function store(StoreRoadmapRequest $request)
     {
-        return view('roadmaps.create');
+        $roadmap = $this->roadmapService->createRoadmap(auth()->user(), $request->validated());
+        return redirect()->route('roadmaps.show', $roadmap)
+            ->with('success', 'Roadmap created! Add your first topic to get started.');
     }
 
-    /**
-     * Store new roadmap
-     */
-    public function store(StoreRoadmapRequest $request): RedirectResponse
-    {
-        $roadmap = $this->roadmapService->createRoadmap(
-            auth()->user(),
-            $request->validated()
-        );
-
-        return redirect()
-            ->route('roadmaps.show', $roadmap)
-            ->with('success', 'Roadmap created successfully!');
-    }
-
-    /**
-     * Display roadmap details
-     */
-    public function show(Roadmap $roadmap): View
+    public function show(Roadmap $roadmap)
     {
         $this->authorize('view', $roadmap);
-
-        $roadmap->load(['topics.resources', 'topics.progress']);
-        $stats = $this->progressService->getProgressStats($roadmap);
-
-        return view('roadmaps.show', compact('roadmap', 'stats'));
+        $roadmap->load(['phases', 'topics.resources', 'certificates']);
+        return view('roadmaps.show', compact('roadmap'));
     }
 
-    /**
-     * Show edit form
-     */
-    public function edit(Roadmap $roadmap): View
+    public function update(UpdateRoadmapRequest $request, Roadmap $roadmap)
     {
         $this->authorize('update', $roadmap);
-
-        return view('roadmaps.edit', compact('roadmap'));
+        $roadmap = $this->roadmapService->updateRoadmap($roadmap, $request->validated());
+        return back()->with('success', 'Roadmap updated.');
     }
 
-    /**
-     * Update roadmap
-     */
-    public function update(UpdateRoadmapRequest $request, Roadmap $roadmap): RedirectResponse
-    {
-        $this->authorize('update', $roadmap);
-
-        $this->roadmapService->updateRoadmap($roadmap, $request->validated());
-
-        return redirect()
-            ->route('roadmaps.show', $roadmap)
-            ->with('success', 'Roadmap updated successfully!');
-    }
-
-    /**
-     * Delete roadmap
-     */
-    public function destroy(Roadmap $roadmap): RedirectResponse
+    public function destroy(Roadmap $roadmap)
     {
         $this->authorize('delete', $roadmap);
-
         $this->roadmapService->deleteRoadmap($roadmap);
+        return redirect()->route('dashboard')->with('success', 'Roadmap deleted.');
+    }
 
-        return redirect()
-            ->route('roadmaps.index')
-            ->with('success', 'Roadmap deleted successfully!');
+    public function clone(Roadmap $roadmap)
+    {
+        $clone = $this->roadmapService->cloneRoadmap($roadmap, auth()->user());
+        return redirect()->route('roadmaps.show', $clone)->with('success', 'Roadmap cloned to your workspace!');
     }
 }
 ```
 
 ---
 
-## Form Requests & Validation
+## Jobs & Queues
 
-### StoreRoadmapRequest
+All jobs use the `redis` queue connection via Laravel Horizon.
 
 ```php
-<?php
-
-namespace App\Http\Requests\Roadmap;
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class StoreRoadmapRequest extends FormRequest
+// GenerateAIRoadmap.php
+class GenerateAIRoadmap implements ShouldQueue
 {
-    public function authorize(): bool
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $timeout = 60;
+    public int $tries   = 3;
+
+    public function __construct(
+        public User $user,
+        public string $prompt,
+        public string $sessionId    // For real-time progress via Pusher
+    ) {}
+
+    public function handle(GeminiService $ai, RoadmapService $roadmapSvc): void
     {
-        return true;
+        $data    = $ai->generateRoadmap($this->prompt);
+        $roadmap = $roadmapSvc->createRoadmapFromAI($this->user, $data);
+
+        broadcast(new AIRoadmapGenerated($this->user, $roadmap, $this->sessionId));
+    }
+}
+```
+
+---
+
+## Broadcasting (Pusher)
+
+### Event Configuration
+
+```php
+// config/broadcasting.php (relevant section)
+'pusher' => [
+    'driver'  => 'pusher',
+    'key'     => env('PUSHER_APP_KEY'),
+    'secret'  => env('PUSHER_APP_SECRET'),
+    'app_id'  => env('PUSHER_APP_ID'),
+    'options' => [
+        'cluster' => env('PUSHER_APP_CLUSTER', 'ap2'),
+        'useTLS'  => true,
+    ],
+],
+```
+
+### Broadcastable Event Example
+
+```php
+// app/Events/BadgeEarned.php
+class BadgeEarned implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(public User $user, public Badge $badge) {}
+
+    public function broadcastOn(): PrivateChannel
+    {
+        return new PrivateChannel("user.{$this->user->id}");
     }
 
-    public function rules(): array
-    {
-        return [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:5000',
-            'category' => 'nullable|string|max:100',
-            'difficulty_level' => 'nullable|in:beginner,intermediate,advanced',
-            'target_completion_date' => 'nullable|date|after:today',
-        ];
-    }
+    public function broadcastAs(): string { return 'badge.earned'; }
 
-    public function messages(): array
+    public function broadcastWith(): array
     {
         return [
-            'title.required' => 'Please provide a title for your roadmap',
-            'target_completion_date.after' => 'Target date must be in the future',
+            'badge'   => ['name' => $this->badge->name, 'icon' => $this->badge->icon],
+            'message' => "You earned the \"{$this->badge->name}\" badge!",
         ];
     }
 }
@@ -1262,133 +890,143 @@ class StoreRoadmapRequest extends FormRequest
 
 ---
 
-## Database Migrations
+## Package Reference
 
-### Create Users Table
+### Composer Packages (Laravel)
 
-```php
-<?php
+| Package | Purpose |
+|---------|---------|
+| `laravel/sanctum` | Session + API token auth |
+| `laravel/breeze` | Auth scaffolding |
+| `laravel/horizon` | Queue dashboard |
+| `laravel/scout` | Full-text search integration |
+| `laravel/telescope` | Dev debugger |
+| `laravel/socialite` | OAuth (Google, GitHub, LinkedIn) |
+| `pusher/pusher-php-server` | Pusher WebSocket broadcasting |
+| `spatie/laravel-permission` | Role-based access control |
+| `spatie/laravel-backup` | Automated backups |
+| `spatie/laravel-media-library` | File management |
+| `spatie/laravel-sluggable` | Auto-slug generation |
+| `spatie/laravel-activitylog` | Activity logging |
+| `spatie/laravel-sitemap` | Auto sitemap.xml |
+| `spatie/laravel-feed` | RSS/Atom feed |
+| `spatie/browsershot` | OG image via headless Chrome |
+| `spatie/laravel-csp` | Content-Security-Policy headers |
+| `barryvdh/laravel-dompdf` | PDF generation (certificates, exports) |
+| `intervention/image` | Image resizing, avatar crop |
+| `teamtnt/laravel-scout-tntsearch-driver` | Full-text search (pure PHP, no service) |
+| `simplesoftwareio/simple-qrcode` | Server-side QR code generation |
+| `pragmarx/google2fa-laravel` | TOTP 2FA (Google Authenticator compatible) |
+| `tightenco/scribe` | API documentation auto-generation |
+| `rap2hpoutre/laravel-log-viewer` | Web log viewer in admin panel |
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+### Install Command
 
-return new class extends Migration
-{
-    public function up(): void
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('username', 30)->unique();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('full_name', 100)->nullable();
-            $table->string('profession', 100)->nullable();
-            $table->text('bio')->nullable();
-            $table->string('profile_picture')->nullable();
-            $table->rememberToken();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-    }
-};
+```powershell
+composer require \
+    laravel/sanctum laravel/horizon laravel/scout laravel/socialite \
+    pusher/pusher-php-server \
+    spatie/laravel-permission spatie/laravel-backup spatie/laravel-media-library \
+    spatie/laravel-sluggable spatie/laravel-activitylog spatie/laravel-sitemap \
+    spatie/laravel-feed spatie/laravel-csp \
+    barryvdh/laravel-dompdf intervention/image \
+    teamtnt/laravel-scout-tntsearch-driver \
+    simplesoftwareio/simple-qrcode \
+    pragmarx/google2fa-laravel \
+    tightenco/scribe
 ```
 
-### Create Roadmaps Table
+### TNTSearch Setup
+
+```powershell
+# .env
+SCOUT_DRIVER=tntsearch
+
+# Index models
+php artisan scout:import "App\Models\Roadmap"
+php artisan scout:import "App\Models\Topic"
+php artisan scout:import "App\Models\Resource"
+php artisan scout:import "App\Models\JournalEntry"
+```
+
+### 2FA TOTP Setup
 
 ```php
-<?php
+// app/Services/Auth/TwoFactorService.php
+use PragmaRX\Google2FA\Google2FA;
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
+class TwoFactorService
 {
-    public function up(): void
-    {
-        Schema::create('roadmaps', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->string('category', 100)->nullable();
-            $table->enum('difficulty_level', ['beginner', 'intermediate', 'advanced'])->nullable();
-            $table->date('target_completion_date')->nullable();
-            $table->boolean('is_public')->default(false);
-            $table->decimal('total_score', 5, 2)->default(0);
-            $table->decimal('progress_percentage', 5, 2)->default(0);
-            $table->enum('status', ['draft', 'active', 'completed', 'archived'])->default('active');
-            $table->timestamps();
-            $table->softDeletes();
+    private Google2FA $google2fa;
 
-            $table->index(['user_id', 'status']);
-            $table->index('is_public');
-        });
+    public function __construct()
+    {
+        $this->google2fa = new Google2FA();
     }
 
-    public function down(): void
+    public function generateSecret(): string
     {
-        Schema::dropIfExists('roadmaps');
+        return $this->google2fa->generateSecretKey();
     }
-};
+
+    public function getQrCodeUrl(User $user): string
+    {
+        return $this->google2fa->getQRCodeUrl(
+            config('app.name'),
+            $user->email,
+            $user->two_factor_secret
+        );
+    }
+
+    public function verify(User $user, string $code): bool
+    {
+        return $this->google2fa->verifyKey($user->two_factor_secret, $code);
+    }
+}
 ```
 
 ---
 
-## Best Practices
+## Testing Strategy
 
-### 1. Service Pattern Guidelines
+### Tools
 
-- **Single Responsibility**: Each service handles one domain
-- **Dependency Injection**: Inject dependencies via constructor
-- **Return Types**: Always specify return types
-- **Type Hints**: Use strict typing for parameters
-- **Transactions**: Wrap multi-step operations in DB transactions
+| Tool | Purpose |
+|------|---------|
+| **Pest PHP** | Primary test framework |
+| **Laravel Dusk** | Browser testing (ChromeDriver, Windows) |
+| **Playwright** | Cross-browser E2E |
+| **Lighthouse CI** | Performance regression testing |
+| **Laravel Telescope** | Dev request/query debugger |
 
-### 2. Controller Guidelines
+### Running Tests (Windows / Laragon)
 
-- **Thin Controllers**: Keep controllers thin, delegate to services
-- **Authorization**: Use policies for authorization checks
-- **Validation**: Use Form Requests for validation
-- **RESTful**: Follow RESTful conventions
-- **Return Types**: Always specify return types (View, RedirectResponse, JsonResponse)
+```powershell
+# All tests
+php artisan test
 
-### 3. Model Guidelines
+# With coverage (Xdebug bundled in Laragon)
+php artisan test --coverage
 
-- **Relationships**: Define all relationships in models
-- **Accessors**: Use accessors for computed attributes
-- **Scopes**: Use query scopes for reusable queries
-- **Casting**: Cast attributes to proper types
-- **Mass Assignment**: Protect against mass assignment with $fillable
+# Specific test
+php artisan test --filter=RoadmapProgressTest
 
-### 4. Security Guidelines
+# Pest
+.\vendor\bin\pest
 
-- **Authorization**: Always check permissions in controllers
-- **Validation**: Validate all inputs
-- **SQL Injection**: Use Eloquent ORM, never raw queries with user input
-- **XSS Prevention**: Blade auto-escapes, use {!! !!} carefully
-- **CSRF**: CSRF token on all POST/PUT/DELETE requests
+# Browser tests
+php artisan dusk
+```
 
-### 5. Testing Guidelines
+### Test Coverage Targets
 
-- **Unit Tests**: Test services and models
-- **Feature Tests**: Test complete workflows
-- **Database**: Use RefreshDatabase trait
-- **Factories**: Use factories for test data
-- **Coverage**: Aim for 70%+ code coverage
+| Layer | Target |
+|-------|--------|
+| Services | ≥ 80% |
+| Controllers | All endpoints covered |
+| Models | Key scopes + accessors |
+| Browser (Dusk) | Critical flows: register, create roadmap, complete topic, SRS review |
 
 ---
 
-## Conclusion
-
-This backend architecture provides a solid foundation for the Learning Progress Tracker platform. The service pattern ensures separation of concerns, making the codebase maintainable, testable, and scalable. Follow the guidelines and patterns outlined in this document for consistent implementation across the application.
-
-For frontend integration details, refer to `frontend.md`. For day-by-day implementation steps, see the `steps/` directory.
+*LearnForge Backend v4.0 — Laravel 12.x · PHP 8.3+ · Laragon Full (Windows) · No Docker*
