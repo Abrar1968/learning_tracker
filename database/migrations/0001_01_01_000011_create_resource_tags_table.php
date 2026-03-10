@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('resource_tags', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('resource_id')->constrained()->onDelete('cascade');
-            $table->string('tag_name');
+            $table->foreignId('resource_id')->constrained('resources')->cascadeOnDelete();
+            $table->string('tag_name', 50);
             $table->timestamps();
-
-            $table->index('resource_id');
+            
             $table->index('tag_name');
         });
     }

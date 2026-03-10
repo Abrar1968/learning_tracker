@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('topic_dependencies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('topic_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('depends_on_topic_id')->constrained('topics')->cascadeOnDelete();
-            $table->boolean('is_required')->default(true); // true = hard dependency, false = recommended
+            $table->foreignId('topic_id')->constrained('topics')->cascadeOnDelete();
+            $table->foreignId('depends_on_id')->constrained('topics')->cascadeOnDelete();
             $table->timestamps();
             
-            $table->unique(['topic_id', 'depends_on_topic_id']);
+            $table->unique(['topic_id', 'depends_on_id']);
         });
     }
 
